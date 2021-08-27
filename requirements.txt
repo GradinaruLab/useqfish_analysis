@@ -1,0 +1,14 @@
+tqdm
+dask
+zarr
+scipy
+scikit-image
+cellpose
+mxnet
+omexml-dls
+napari
+tifffile
+pandas
+numpy
+openpyxl
+PyQt5

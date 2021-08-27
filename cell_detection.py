@@ -210,20 +210,5 @@ def read_ome_metadata(filePath):
 def image_read(filename):
     """
     read ome-tiff file as numpy array, converted to [0.0 1.0] float32 type
-    if dapi channel is not the first, bring the dapi channel to the first
     """
-    # if chDapi != 0:
-    #     img = np.zeros_like(imgLoaded)
-    #     img[0] = imgLoaded[chDapi]
-    #     newIdx = 1
-    #     for c in range(imgLoaded.shape[0]):
-    #         if c != chDapi:
-    #             img[newIdx] = imgLoaded[c]
-    #             newIdx = newIdx + 1
-    #     imgLoaded = img
-
-    #     del img
-    #     gc.collect()
-
-    # return imgLoaded
     return tifffile.imread(filename)

@@ -1,6 +1,7 @@
 from cell_detection import *
 from spot_detection import *
 from image_manipulation import *
+from params import *
 
 import pandas as pd
 from pylab import *
@@ -29,22 +30,8 @@ args = my_parser.parse_args()
 path = args.Path
 filepath = os.path.join(path, '*.tif')    
 filenames = glob.glob(filepath)
-
-# TODO: make these parameters an argument somehow
-nR = len(filenames)
-nC = 5
-roundRef = -1    # assuming the last round is the reference of cells and nuclei
-cellch = 3
-
-sigma = 3
-shift_window_size = 200
-
-color_shifts = [[8, 0, 0],          # color aberration shifts to 647 aquired by imaging focalcheck #1, 500nm
-                [-1, 0, 1],
-                [0, 0, 0],
-                [0, 0, 0],
-                [1, -3, 2]]
-
+print(filenames)
+nR = len(filenames) # number of rounds
 
 # 1. 3d spot detection
 imgReference = image_read(filenames[roundRef])
