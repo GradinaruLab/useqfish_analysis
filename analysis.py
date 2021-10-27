@@ -15,6 +15,8 @@ import dask
 import dask.array as da
 from dask.diagnostics import ProgressBar
 
+import zarr
+
 
 my_parser = argparse.ArgumentParser(description='Run analysis on a group of images')
 
@@ -106,6 +108,9 @@ for r, spots_assigned in enumerate(spots_assigned_allrounds):
 #         for spot in spots:
 #             spotResults.append(np.append(np.array([r, c+1]), spot))
 
+# image save for visualization on local 
+zarr.save_group(os.path.join(path, 'result_images.zip'), zToXYRatioReal, cellLabels, cellOutlines, spots_assigned_allrounds)
+
 # spotCoords = np.array([np.array(coords) for coords in spotCoords])
 spots_results = np.array(spots_results)
 print(f'>>>> Total {spots_results.shape[0]} spots detected')
@@ -137,64 +142,3 @@ for spot_index in range(spots_results.shape[0]):
 
 resultDf2 = pd.DataFrame(data=spots_per_cell)
 resultDf2.to_excel(excel_writer=os.path.join(path, 'result_spots_per_cell.xlsx'))
-
-
-print(f'>> STEP 5. visualization')
-zyxScale = (zToXYRatioReal, 1, 1)
-with napari.gui_qt():
-    viewer = napari.Viewer()
-    # for img in results:
-    #     viewer.add_image(img)
-
-    viewer.add_image(
-        imgReference[0],
-        name='dapi reference',
-        scale=zyxScale,
-        contrast_limits=[0, imgReference[0].max()],
-        multiscale=False
-    )
-    viewer.add_image(
-        imgReference[cellch],
-        name='cell reference',
-        scale=zyxScale,
-        contrast_limits=[0, imgReference[cellch].max()],
-        multiscale=False
-    )
-    viewer.add_labels(
-        cellLabels,
-        name='cell labels',
-        scale=zyxScale,
-        multiscale=False
-    )
-    viewer.add_image(
-        cellOutlines,
-        name='cell outlines',
-        scale=zyxScale,
-        multiscale=False
-    )
-
-    # cmap = np.linspace(0, 1, num=(nR-1)*(nC-1))
-    cmap = cm.get_cmap('turbo', (nR-1)*(nC-1))
-    colors = [matplotlib.colors.rgb2hex(c) for c in cmap.colors]
-    cIndex = 0
-    for r, spots_assigned in enumerate(spots_assigned_allrounds):
-        for c, spots in enumerate(spots_assigned):
-            spots = np.array(spots)
-            if spots.shape[0] > 0:
-                spots = spots[:,:-1]
-                # print(spots.shape)
-                # pointProperties = {
-                #     'good_point': np.ones((spots.shape[0],), dtype=bool),
-                #     'confidence': np.full((spots.shape[0],), cmap[cIndex])
-                # }
-                # print(cmap[cIndex])
-                viewer.add_points(
-                    spots,
-                    face_color=colors[cIndex],
-                    size=10,
-                    n_dimensional=True,
-                    name=f'{r} round, {c+1} ch',
-                    scale=zyxScale,
-                    blending='additive'
-                )
-                cIndex = cIndex + 1
