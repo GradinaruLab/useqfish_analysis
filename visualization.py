@@ -23,7 +23,7 @@ args = my_parser.parse_args()
 
 path = args.Path
 
-cells = zarr.load(os.path.join(path, 'result_cellsegments.zarr'))
+cells = zarr.load(os.path.join(path, 'result_images.zarr'))
 zToXYRatioReal = cells['zToXYRatioReal']
 imgCells = cells['imgCells']
 cellLabels = cells['cellLabels']

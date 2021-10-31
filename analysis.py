@@ -130,7 +130,7 @@ for r, spots_assigned in enumerate(spots_assigned_allrounds):
 # image save for visualization on local 
 
 zarr.save(
-    os.path.join(path, 'result/result_cellsegments.zarr'),
+    os.path.join(path, 'result/result_images.zarr'),
     imgCells=img_cells,
     cellLabels=cellLabels,
     cellOutlines=cellOutlines,
