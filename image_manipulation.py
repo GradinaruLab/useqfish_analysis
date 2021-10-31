@@ -4,6 +4,10 @@ from cellpose import transforms, utils
 from scipy.ndimage import white_tophat
 import tifffile
 
+import gc
+from tqdm import tqdm
+from oxdls import OMEXML
+
 
 def image_read(filename):
     """
@@ -96,6 +100,41 @@ def background_subtraction(img, size=10, mode='nearest'):
     # return imgTophat
     return filtered[None,...]
 
+def mask_closing(mask, selem=morphology.ball(2), expand=True, expandDist=2):
+    maskClosed = np.zeros_like(mask)
+
+    # for i in range(1, mask.max()+1):
+    #     maskI = (mask==i)
+    #     maskIClosed = morphology.binary_closing(maskI, selem=selem)
+    #     # maskIClosed = morphology.binary_erosion(maskIClosed, selem=selem)
+    #     # maskIClosed = morphology.binary_dilation(maskIClosed, selem=expand)
+
+    #     z, y, x = np.nonzero(maskIClosed)
+    #     # for c in range(z.size):
+    #     #     if mask[z[c],y[c],x[c]]==0 or mask[z[c],y[c],x[c]]==i:
+    #     #         maskClosed[z[c],y[c],x[c]] = i
+                
+    #     maskClosed[z,y,x] = i
+
+    for i in tqdm(range(1, mask.max()+1)):
+        maskI = (mask==i)
+        for z in range(maskI.shape[0]):
+            maskIHull = morphology.convex_hull_image(maskI[z])
+            y, x = np.nonzero(maskIHull)
+            maskClosed[z,y,x] = i
+        for y in range(maskI.shape[1]):
+            maskIHull = morphology.convex_hull_image(maskI[:,y,:])
+            z, x = np.nonzero(maskIHull)
+            maskClosed[z,y,x] = i
+        for x in range(maskI.shape[2]):
+            maskIHull = morphology.convex_hull_image(maskI[:,:,x])
+            z, y = np.nonzero(maskIHull)
+            maskClosed[z,y,x] = i
+
+    if expand:
+        maskClosed = segmentation.expand_labels(maskClosed, distance=expandDist)
+
+    return maskClosed
 
 def mask_upsample(mask, finalShape=None):
     if finalShape is None:
@@ -133,3 +172,44 @@ def image_shift(movImg, refImgDapi):
 
     # return shift[None,...]
     return shift
+
+
+def image_warp(img, shift=None):
+    # img = img[0,...]
+    if shift is None:
+        shift = np.array([0,0,0])
+    # else:
+    #     shift = shift[0,...]
+
+    z, y, x = img.shape
+    newZ, newY, newX = np.mgrid[:z, :y, :x]
+    newCoordinates = np.array([newZ-shift[0], newY-shift[1], newX-shift[2]])
+    imgMoved = transform.warp(img, newCoordinates, mode='constant', cval=0)
+
+    del newZ, newY, newX, newCoordinates
+    gc.collect()
+
+    # return imgMoved[None,...]
+    return imgMoved
+
+
+def read_ome_metadata(filePath):
+    """
+    Args: file path of ome-tiff
+
+    Returns: dictionary of parsed metadata
+    """
+    with tifffile.TiffFile(filePath) as tif:
+        imgMetadata = OMEXML(tif.ome_metadata)
+    
+    dictMetadata = {'nChannels': imgMetadata.image().Pixels.channel_count,
+                    'xPixels': imgMetadata.image().Pixels.SizeX,
+                    'yPixels': imgMetadata.image().Pixels.SizeY,
+                    'zPixels': imgMetadata.image().Pixels.SizeZ,
+                    'xRealSize': imgMetadata.image().Pixels.PhysicalSizeX,
+                    'yRealSize': imgMetadata.image().Pixels.PhysicalSizeY,
+                    'zRealSize': imgMetadata.image().Pixels.PhysicalSizeZ,
+                    'channelNames': [imgMetadata.image().Pixels.Channel(ch).Name.split('_')[0] for ch in range(imgMetadata.image().Pixels.channel_count)]
+    }
+
+    return dictMetadata
