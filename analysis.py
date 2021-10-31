@@ -1,3 +1,7 @@
+# unmute when the error "libgcc_s.so.1 must be installed for pthread_cancel to work" came up
+# import ctypes
+# libgcc_s = ctypes.CDLL('libgcc_s.so.1')
+
 from cell_detection import *
 from spot_detection import *
 from image_manipulation import *
@@ -5,7 +9,7 @@ from params import *
 
 import pandas as pd
 from pylab import *
-import napari
+# import napari
 
 import argparse
 import os
@@ -16,7 +20,13 @@ import dask.array as da
 from dask.diagnostics import ProgressBar
 
 import zarr
+import numcodecs
 
+import warnings
+
+from pickling import *
+
+warnings.filterwarnings("ignore")
 
 my_parser = argparse.ArgumentParser(description='Run analysis on a group of images')
 
@@ -31,7 +41,7 @@ args = my_parser.parse_args()
 
 path = args.Path
 filepath = os.path.join(path, '*.tif')    
-filenames = glob.glob(filepath)
+filenames = sorted(glob.glob(filepath), key=os.path.basename)
 print(filenames)
 nR = len(filenames) # number of rounds
 
@@ -40,9 +50,18 @@ imgReference = image_read(filenames[roundRef])
 dapi_reference = img_as_float32(imgReference[0])
 size_z, size_y, size_x = dapi_reference.shape
 
-print(f'>> STEP 1. Cell detection -')
-cellLabels, cellOutlines, zToXYRatioReal, nCells = cell_detection(filenames[roundRef], cellCh=cellch, resizeFactor=0.2, color_shift=color_shifts[0])
+imgMetadata = read_ome_metadata(filenames[roundRef])
+zToXYRatioReal = imgMetadata['zRealSize']/imgMetadata['xRealSize']
 
+
+print(f'>> STEP 1. Cell detection -')
+img_cells = np.stack((imgReference[cellch], imgReference[0]), axis=3)
+cellLabels, cellOutlines, zToXYRatioReal, nCells = cell_detection(
+    img_cells, 
+    zToXYRatioReal=zToXYRatioReal,
+    resizeFactor=0.2, 
+    color_shift=color_shifts[0]
+)
 
 print(f'>> STEP 2. registration - ')
 spots_assigned_allrounds = []
@@ -109,7 +128,15 @@ for r, spots_assigned in enumerate(spots_assigned_allrounds):
 #             spotResults.append(np.append(np.array([r, c+1]), spot))
 
 # image save for visualization on local 
-zarr.save_group(os.path.join(path, 'result_images.zip'), zToXYRatioReal, cellLabels, cellOutlines, spots_assigned_allrounds)
+
+zarr.save(
+    os.path.join(path, 'result/result_cellsegments.zarr'),
+    imgCells=img_cells,
+    cellLabels=cellLabels,
+    cellOutlines=cellOutlines,
+    zToXYRatioReal=zToXYRatioReal,
+    nR=nR
+)
 
 # spotCoords = np.array([np.array(coords) for coords in spotCoords])
 spots_results = np.array(spots_results)
@@ -124,7 +151,7 @@ resultDf = pd.DataFrame({
     'x-coord': spots_results[:,4],
     'cell id': spots_results[:,5]
 })
-resultDf.to_excel(excel_writer=os.path.join(path, 'result.xlsx'))
+resultDf.to_excel(excel_writer=os.path.join(path, 'result/result.xlsx'))
 
 target_index = np.zeros((nR, nC), dtype=np.int)
 index = 0
@@ -141,4 +168,4 @@ for spot_index in range(spots_results.shape[0]):
     spots_per_cell[cell_id, target_index[r-1, c-1]] = spots_per_cell[cell_id, target_index[r-1, c-1]]+1
 
 resultDf2 = pd.DataFrame(data=spots_per_cell)
-resultDf2.to_excel(excel_writer=os.path.join(path, 'result_spots_per_cell.xlsx'))
+resultDf2.to_excel(excel_writer=os.path.join(path, 'result/result_spots_per_cell.xlsx'))
