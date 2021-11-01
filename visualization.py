@@ -28,6 +28,7 @@ zToXYRatioReal = cells['zToXYRatioReal']
 imgCells = cells['imgCells']
 cellLabels = cells['cellLabels']
 cellOutlines = cells['cellOutlines']
+dapis_shifted = cells['dapis_shifted']
 nR = cells['nR']
 spots = pd.read_excel(os.path.join(path, 'result.xlsx'), index_col=0)
 
@@ -69,6 +70,14 @@ viewer.add_image(
     scale=zyxScale,
     multiscale=False
 )
+
+for r in range(nR-1):
+    viewer.add_image(
+        dapis_shifted[r],
+        name=f'{r} round dapi shifted',
+        scale=zyxScale,
+        multiscale=False
+    )
 
 # cmap = np.linspace(0, 1, num=(nR-1)*(nC-1))
 cmap = cm.get_cmap('turbo', (nR-1)*(nC-1))

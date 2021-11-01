@@ -24,7 +24,7 @@ import numcodecs
 
 import warnings
 
-from pickling import *
+from skimage.util import img_as_ubyte
 
 warnings.filterwarnings("ignore")
 
@@ -65,6 +65,7 @@ cellLabels, cellOutlines, zToXYRatioReal, nCells = cell_detection(
 
 print(f'>> STEP 2. registration - ')
 spots_assigned_allrounds = []
+dapis_shifted = []
 for filename in filenames[:roundRef]:
     print(filename)
     img = image_read(filename)
@@ -82,6 +83,8 @@ for filename in filenames[:roundRef]:
     
     # exit()
     print(shifts)
+
+    dapis_shifted.append(img_as_ubyte(image_warp(img[0], shift=shifts[0])))
 
 
     print(f'>> STEP 2-2. Spot detection -')
@@ -135,6 +138,7 @@ zarr.save(
     cellLabels=cellLabels,
     cellOutlines=cellOutlines,
     zToXYRatioReal=zToXYRatioReal,
+    dapis_shifted=np.array(dapis_shifted),
     nR=nR
 )
 
