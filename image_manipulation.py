@@ -155,14 +155,6 @@ def image_with_outlines(img, mask):
     return imgOutlined
 
 
-def image_with_outlines(img, mask):
-    outlines = utils.masks_to_outlines(mask)
-    outZ, outY, outX = np.nonzero(outlines)
-    imgOutlined = np.zeros((img.shape[0], img.shape[1], img.shape[2], 3))
-    imgOutlined[outZ, outY, outX] = np.array([1, 1, 1])
-    return imgOutlined
-
-
 def image_shift(movImg, refImgDapi):
     """
     return shift coordinates

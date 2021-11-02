@@ -3,7 +3,8 @@ roundRef = -1    #  round containing the cell reference; use -1 for the last rou
 cellch = 3      # channel containing cell reference 
 
 sigma = 3       # estimate size of spots to detect
-shift_window_size = 200     # ? TODO
+# shift_window_size = 200     # ? TODO
+shift_window_size = 1000
 
 # color_shifts = [[8, 0, 0],          # color aberration shifts for each channel to 647 aquired by imaging focalcheck #1, 500nm
 #                 [-1, 0, 1],         # from 210507_focalcheck

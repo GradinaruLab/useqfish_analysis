@@ -28,9 +28,12 @@ zToXYRatioReal = cells['zToXYRatioReal']
 imgCells = cells['imgCells']
 cellLabels = cells['cellLabels']
 cellOutlines = cells['cellOutlines']
+shifts_allrounds = cells['shifts_allrounds']
 dapis_shifted = cells['dapis_shifted']
 nR = cells['nR']
 spots = pd.read_excel(os.path.join(path, 'result.xlsx'), index_col=0)
+
+print(shifts_allrounds.shape)
 
 spots_assigned_allrounds = []
 for r in range(nR):
@@ -41,7 +44,20 @@ for r in range(nR):
     spots_assigned_allrounds.append(spots_assigned)
 
 zyxScale = (zToXYRatioReal, 1, 1)
-# with napari.gui_qt():
+
+dapis = zarr.load(os.path.join(path, 'dapis.zarr'))
+dapis_shifted = dapis['dapis_shifted']
+viewer = napari.Viewer()
+# check registration across rounds by using cropped dapi
+for r in range(dapis_shifted.shape[0]):
+    viewer.add_image(
+        dapis_shifted[r],
+        name=f'{r+1} round dapi',
+        scale=zyxScale,
+        contrast_limits=[dapis_shifted[r].min(), dapis_shifted[r].max()],
+        multiscale=False
+    )
+napari.run()
 
 viewer = napari.Viewer()
 viewer.add_image(
@@ -71,13 +87,13 @@ viewer.add_image(
     multiscale=False
 )
 
-for r in range(nR-1):
-    viewer.add_image(
-        dapis_shifted[r],
-        name=f'{r} round dapi shifted',
-        scale=zyxScale,
-        multiscale=False
-    )
+# for r in range(nR-1):
+#     viewer.add_image(
+#         dapis_shifted[r],
+#         name=f'{r} round dapi shifted',
+#         scale=zyxScale,
+#         multiscale=False
+#     )
 
 # cmap = np.linspace(0, 1, num=(nR-1)*(nC-1))
 cmap = cm.get_cmap('turbo', (nR-1)*(nC-1))
@@ -103,6 +119,7 @@ for r, spots_assigned in enumerate(spots_assigned_allrounds):
                 blending='additive'
             )
             cIndex = cIndex + 1
+
 napari.run()
 
     

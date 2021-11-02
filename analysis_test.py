@@ -54,14 +54,14 @@ imgMetadata = read_ome_metadata(filenames[roundRef])
 zToXYRatioReal = imgMetadata['zRealSize']/imgMetadata['xRealSize']
 
 
-print(f'>> STEP 1. Cell detection -')
-img_cells = np.stack((imgReference[cellch], imgReference[0]), axis=3)
-cellLabels, cellOutlines, zToXYRatioReal, nCells = cell_detection(
-    img_cells, 
-    zToXYRatioReal=zToXYRatioReal,
-    resizeFactor=0.2, 
-    color_shift=color_shifts[0]
-)
+# print(f'>> STEP 1. Cell detection -')
+# img_cells = np.stack((imgReference[cellch], imgReference[0]), axis=3)
+# cellLabels, cellOutlines, zToXYRatioReal, nCells = cell_detection(
+#     img_cells, 
+#     zToXYRatioReal=zToXYRatioReal,
+#     resizeFactor=0.2, 
+#     color_shift=color_shifts[0]
+# )
 
 print(f'>> STEP 2. registration - ')
 spots_assigned_allrounds = []
@@ -95,37 +95,41 @@ for filename in filenames[:roundRef]:
     #     dapi_shifted=dapi_shifted     
     # )
 
-    print(f'>> STEP 2-2. Spot detection -')
-    # set up dask for running in parallel
-    daimg = [da.from_array(ch, chunks=(1, -1, -1)) for ch in img[1:]]
+    # print(f'>> STEP 2-2. Spot detection -')
+    # # set up dask for running in parallel
+    # daimg = [da.from_array(ch, chunks=(1, -1, -1)) for ch in img[1:]]
     
-    daimg = [da.map_blocks(median_filter, ch) for ch in daimg]
-    daimg = [da.map_blocks(background_subtraction, ch, size=100) for ch in daimg]
+    # daimg = [da.map_blocks(median_filter, ch) for ch in daimg]
+    # daimg = [da.map_blocks(background_subtraction, ch, size=100) for ch in daimg]
 
-    with ProgressBar():
-        daimg = [ch.compute() for ch in daimg]
-    # print(daimg[0].shape)
+    # with ProgressBar():
+    #     daimg = [ch.compute() for ch in daimg]
+    # # print(daimg[0].shape)
 
-    img_delayed = [dask.delayed(ch) for ch in daimg]
+    # img_delayed = [dask.delayed(ch) for ch in daimg]
 
-    spots = [
-        dask.delayed(blob_detection)(
-            ch, shift=shift, minSigma=sigma, maxSigma=sigma, numSigma=1, threshold=0.005
-        )
-        for ch, shift in zip(img_delayed, shifts)
-    ]
+    # spots = [
+    #     dask.delayed(blob_detection)(
+    #         ch, shift=shift, minSigma=sigma, maxSigma=sigma, numSigma=1, threshold=0.005
+    #     )
+    #     for ch, shift in zip(img_delayed, shifts)
+    # ]
 
-    spots_assigned = [dask.delayed(spot_assignment)(spot, cellLabels) for spot in spots]
+    # spots_assigned = [dask.delayed(spot_assignment)(spot, cellLabels) for spot in spots]
 
-    with ProgressBar():
-        # spots = list(dask.compute(*spots))
-        spots_assigned = list(dask.compute(*spots_assigned))
+    # with ProgressBar():
+    #     # spots = list(dask.compute(*spots))
+    #     spots_assigned = list(dask.compute(*spots_assigned))
 
-    spots_assigned_allrounds.append(spots_assigned)
-    shifts_allrounds.append(np.array(shifts))
+    # spots_assigned_allrounds.append(spots_assigned)
+    # shifts_allrounds.append(np.array(shifts))
 
 dapis_shifted.append(dapi_reference[:, int(size_y/2-shift_window_size):int(size_y/2), int(size_x/2-shift_window_size):int(size_x/2)])
-
+zarr.save(
+    os.path.join(path, 'result/dapis.zarr'),
+    dapis_shifted=np.array(dapis_shifted)
+)
+exit()
 print(f'>> STEP 4. Save results -')
 spots_results = []
 for r, spots_assigned in enumerate(spots_assigned_allrounds):
