@@ -28,36 +28,36 @@ zToXYRatioReal = cells['zToXYRatioReal']
 imgCells = cells['imgCells']
 cellLabels = cells['cellLabels']
 cellOutlines = cells['cellOutlines']
-shifts_allrounds = cells['shifts_allrounds']
-dapis_shifted = cells['dapis_shifted']
-nR = cells['nR']
-spots = pd.read_excel(os.path.join(path, 'result.xlsx'), index_col=0)
+# shifts_allrounds = cells['shifts_allrounds']
+# dapis_shifted = cells['dapis_shifted']
+# nR = cells['nR']
 
-print(shifts_allrounds.shape)
+# spots = pd.read_excel(os.path.join(path, 'result.xlsx'), index_col=0)
 
-spots_assigned_allrounds = []
-for r in range(nR):
-    spots_assigned = []
-    for c in range(nC):
-        coords = spots.loc[(spots['round']==r) & (spots['channel']==c), ['z-coord', 'y-coord', 'x-coord']].to_numpy()
-        spots_assigned.append(coords)
-    spots_assigned_allrounds.append(spots_assigned)
+# spots_assigned_allrounds = []
+# for r in range(nR):
+#     spots_assigned = []
+#     for c in range(nC):
+#         coords = spots.loc[(spots['round']==r) & (spots['channel']==c), ['z-coord', 'y-coord', 'x-coord']].to_numpy()
+#         spots_assigned.append(coords)
+#     spots_assigned_allrounds.append(spots_assigned)
 
 zyxScale = (zToXYRatioReal, 1, 1)
 
-dapis = zarr.load(os.path.join(path, 'dapis.zarr'))
-dapis_shifted = dapis['dapis_shifted']
+# dapis = zarr.load(os.path.join(path, 'dapis.zarr'))
+# dapis_shifted = dapis['dapis_shifted']
 viewer = napari.Viewer()
 # check registration across rounds by using cropped dapi
-for r in range(dapis_shifted.shape[0]):
-    viewer.add_image(
-        dapis_shifted[r],
-        name=f'{r+1} round dapi',
-        scale=zyxScale,
-        contrast_limits=[dapis_shifted[r].min(), dapis_shifted[r].max()],
-        multiscale=False
-    )
-napari.run()
+# for r in range(dapis_shifted.shape[0]):
+#     viewer.add_image(
+#         dapis_shifted[r],
+#         name=f'{r+1} round dapi',
+#         scale=zyxScale,
+#         contrast_limits=[dapis_shifted[r].min(), dapis_shifted[r].max()],
+#         multiscale=False,
+#         blending='additive'
+#     )
+# napari.run()
 
 viewer = napari.Viewer()
 viewer.add_image(
@@ -96,30 +96,28 @@ viewer.add_image(
 #     )
 
 # cmap = np.linspace(0, 1, num=(nR-1)*(nC-1))
-cmap = cm.get_cmap('turbo', (nR-1)*(nC-1))
-colors = [matplotlib.colors.rgb2hex(c) for c in cmap.colors]
-cIndex = 0
-for r, spots_assigned in enumerate(spots_assigned_allrounds):
-    for c, spots in enumerate(spots_assigned):
-        spots = np.array(spots)
-        if spots.shape[0] > 0:
-            # print(spots.shape)
-            # pointProperties = {
-            #     'good_point': np.ones((spots.shape[0],), dtype=bool),
-            #     'confidence': np.full((spots.shape[0],), cmap[cIndex])
-            # }
-            # print(cmap[cIndex])
-            viewer.add_points(
-                spots,
-                face_color=colors[cIndex],
-                size=10,
-                n_dimensional=True,
-                name=f'{r} round, {c+1} ch',
-                scale=zyxScale,
-                blending='additive'
-            )
-            cIndex = cIndex + 1
+# cmap = cm.get_cmap('turbo', (nR-1)*(nC-1))
+# colors = [matplotlib.colors.rgb2hex(c) for c in cmap.colors]
+# cIndex = 0
+# for r, spots_assigned in enumerate(spots_assigned_allrounds):
+#     for c, spots in enumerate(spots_assigned):
+#         spots = np.array(spots)
+#         if spots.shape[0] > 0:
+#             # print(spots.shape)
+#             # pointProperties = {
+#             #     'good_point': np.ones((spots.shape[0],), dtype=bool),
+#             #     'confidence': np.full((spots.shape[0],), cmap[cIndex])
+#             # }
+#             # print(cmap[cIndex])
+#             viewer.add_points(
+#                 spots,
+#                 face_color=colors[cIndex],
+#                 size=20,
+#                 n_dimensional=True,
+#                 name=f'{r} round, {c+1} ch',
+#                 scale=zyxScale,
+#                 blending='additive'
+#             )
+#             cIndex = cIndex + 1
 
 napari.run()
-
-    

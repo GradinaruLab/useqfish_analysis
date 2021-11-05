@@ -28,26 +28,25 @@ def run_cellpose(
         stitch_threshold=stitch_threshold,
         cellprob_threshold=cellprob_threshold,
         flow_threshold=flow_threshold,
-        min_size=min_size
+        min_size=min_size,
+        z_axis=0,
+        channel_axis=1
     )
     return mask, flow, style, diam
 
-def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2, color_shift=None):
+def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     """
     main function for cell detection using cellpose
     """
     
     zToXYRatio = zToXYRatioReal * resizeFactor
     img_cells = img_as_float32(img)
-   
-    if color_shift is not None:
-        img_cells[1] = image_warp(img_cells[1], color_shift)
 
-    imgResizedShaped = image_downsample_shape(img_cells, zToXYRatioReal, resizeFactor=resizeFactor)
+    imgResizedShaped = image_downsample_shape(img_cells, resizeFactor=resizeFactor)
     imgNormalized = image_normalize_layers(imgResizedShaped)
     imgFiltered = image_gaussian_filter(imgNormalized, sigma=2)
 
-    # print(imgFiltered.shape)
+    print(imgFiltered.shape)
 
     # _, _, _, diamEstimated = run_cellpose(
     #     imgFiltered,

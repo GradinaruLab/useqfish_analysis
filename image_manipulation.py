@@ -8,6 +8,9 @@ import gc
 from tqdm import tqdm
 from oxdls import OMEXML
 
+def image_crop(img, shift_window_size):
+    _, size_y, size_x = img.shape
+    return img[:, int(size_y/2-shift_window_size):int(size_y/2), int(size_x/2-shift_window_size):int(size_x/2)]
 
 def image_read(filename):
     """
@@ -15,7 +18,7 @@ def image_read(filename):
     if dapi channel is not the first, bring the dapi channel to the first
     """
     return tifffile.imread(filename)
-
+    
 
 def image_gaussian_filter(img, sigma=1):
     imgFiltered = np.zeros_like(img)
@@ -24,6 +27,11 @@ def image_gaussian_filter(img, sigma=1):
     for z in range(nZ):
         for c in range(nC):
             imgFiltered[z,c,:,:] = filters.gaussian(img[z,c,:,:], sigma=sigma)
+
+    # nZ = img.shape[0]
+
+    # for z in range(nZ):
+    #     imgFiltered[z, :, :] = filters.gaussian(img[z, : :], sigma=sigma)
     
     return imgFiltered
 
@@ -59,10 +67,19 @@ def image_normalize_layers(img):
             stdLayer = np.std(flattenLayer[np.nonzero(flattenLayer)])
             imgNormalized[z,c,:,:] = meanTotal[c] + (img[z,c,:,:] - meanLayer) * (stdTotal[c]/stdLayer)
 
+    # nZ, nY, nX = img.shape
+    # meanTotal = np.mean(img.ravel()[np.nonzero(img.ravel())])
+    # stdTotal = np.std(img.ravel()[np.nonzero(img.ravel())])
+
+    # for z in range(nZ):
+    #     flattenLayer = img[z,:,:].ravel()
+    #     meanLayer = np.mean(flattenLayer[np.nonzero(flattenLayer)])
+    #     stdLayer = np.std(flattenLayer[np.nonzero(flattenLayer)])
+    #     imgNormalized[z, :, :] = meanTotal + (img[z,:,:] - meanLayer) * (stdTotal/stdLayer)
     return imgNormalized
 
 
-def image_downsample_shape(img, zToXYRatioReal, resizeFactor=0.2):
+def image_downsample_shape(img, resizeFactor=0.2):
     # nC, nZ, nX, nY = img.shape
     nZ, nY, nX, nC = img.shape
     # imgdTFirst = np.zeros((nZ, nX, nY, nC), dtype=img.dtype)
@@ -80,6 +97,8 @@ def image_downsample_shape(img, zToXYRatioReal, resizeFactor=0.2):
 
     # print(imgResizedShaped.shape)
     return imgResizedShaped
+    # print(imgResized.shape)
+    # return imgResized
 
 
 def background_subtraction(img, size=10, mode='nearest'):
