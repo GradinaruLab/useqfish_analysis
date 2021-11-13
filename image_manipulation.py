@@ -1,7 +1,7 @@
 from skimage import filters, feature, img_as_float32, registration, transform, morphology, segmentation
 import numpy as np
 from cellpose import transforms, utils
-from scipy.ndimage import white_tophat
+from scipy import ndimage
 import tifffile
 
 import gc
@@ -34,6 +34,10 @@ def image_gaussian_filter(img, sigma=1):
     #     imgFiltered[z, :, :] = filters.gaussian(img[z, : :], sigma=sigma)
     
     return imgFiltered
+
+
+def image_mip(img, axis=0):
+    return img.max(axis)
 
 
 def median_filter(img):
@@ -105,7 +109,7 @@ def background_subtraction(img, size=10, mode='nearest'):
     """
     """
     img = img[0,...]
-    filtered = white_tophat(img, size=size, mode=mode)
+    filtered = ndimage.white_tophat(img, size=size, mode=mode)
     # imgTophat = np.array(
     #     [white_tophat(img[z], size=size, mode=mode) for z in range(img.shape[0])]
     # )
@@ -174,12 +178,12 @@ def image_with_outlines(img, mask):
     return imgOutlined
 
 
-def image_shift(movImg, refImgDapi):
+def image_shift(refImg, movImg):
     """
     return shift coordinates
     """
     # refImg = refImg[0,...]
-    shift, _, _ = registration.phase_cross_correlation(refImgDapi, movImg)
+    shift, _, _ = registration.phase_cross_correlation(refImg, movImg)
 
     # return shift[None,...]
     return shift

@@ -2,7 +2,8 @@ nC = 5      # number of channels / colors
 roundRef = -1    #  round containing the cell reference; use -1 for the last round
 cellch = 3      # channel containing cell reference 
 
-sigma = 3       # estimate size of spots to detect
+sigma = 2      # estimate size of spots to detect
+
 # shift_window_size = 200     # ? TODO
 shift_window_size = 1000
 

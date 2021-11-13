@@ -46,8 +46,6 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     imgNormalized = image_normalize_layers(imgResizedShaped)
     imgFiltered = image_gaussian_filter(imgNormalized, sigma=2)
 
-    print(imgFiltered.shape)
-
     # _, _, _, diamEstimated = run_cellpose(
     #     imgFiltered,
     #     [0,0],

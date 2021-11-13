@@ -74,9 +74,9 @@ def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, thresh
             
     spotCoordinates = functools.reduce(operator.iconcat, spotCoordinates, [])   # make a flatten list
     spotCoordinates = np.array(spotCoordinates)
-    # print(f'spotCoordinates.shape: {spotCoordinates.shape}')
+    # print(f'spotCoordinates.type: {spotCoordinates.dtype}')
     if spotCoordinates.shape[0] > 0:
-        spotNewCoordinates = spot_stitch_3d(spotCoordinates, np.sqrt(2)*maxSigma)
+        spotNewCoordinates = spot_stitch_3d(spotCoordinates, 1)
         spotCoordsMoved = spot_warp(spotNewCoordinates, shift=shift)
         spotCoordsNoBoundary = spot_remove_out_of_boundary(img.shape, spotCoordsMoved, maxSigma)
     else:
@@ -96,6 +96,9 @@ def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, thresh
 
 def spot_stitch_3d(spotCoordinates, radius):
     # nZ = spotCoordinates[:,0].max()
+    if radius < 1:
+        radius = 1
+
     zrange = list(np.unique(spotCoordinates[:,0]))
 
     spotLabels = np.zeros((spotCoordinates.shape[0],), dtype=np.uint16)
@@ -163,13 +166,15 @@ def spot_remove_out_of_boundary(imgShape, spotCoords, radius):
         label = coord[-1]
 
         zyxCoord = np.where(
-            zyxCoord >= radius, 
+            # zyxCoord >= radius,
+            zyxCoord >= 0,
             zyxCoord, 
             np.NaN
             # radius
         )
         zyxCoord = np.where(
-            zyxCoord < (np.array([nZ, nY, nX])-radius),
+            # zyxCoord < (np.array([nZ, nY, nX])-radius),
+            zyxCoord < np.array([nZ, nY, nX]),
             zyxCoord,
             np.NaN
             # np.array([nZ, nY, nX])-radius-1
@@ -195,5 +200,5 @@ def spot_warp(coords, shift=None):
     if shift is None:
         shift = np.array([0,0,0])
 
-    newCoords = np.column_stack((coords[:,0]-shift[0], coords[:,1]-shift[1], coords[:,2]-shift[2], coords[:,3]))
+    newCoords = np.column_stack((coords[:,0]+shift[0], coords[:,1]+shift[1], coords[:,2]+shift[2], coords[:,3]))
     return newCoords
