@@ -51,6 +51,7 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     mask, _, _, _ = run_cellpose(
         imgFiltered,
         [0,0],
+        model_type='cyto2',
         gpu=True,
         # device=mx.gpu(1),
         anisotropy=zToXYRatio,
@@ -69,23 +70,23 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     # outlineRGB = image_with_outlines(np.squeeze(imgResizedShaped[:,0,:,:]), mask)
 
     # # nuclei detection
-    # mask, _, _, _ = run_cellpose(
-    #     # np.stack((imgFiltered[:,1,:,:], np.zeros(imgFiltered[:,1,:,:].shape)), axis=1),
-    #     imgFiltered[:,1,:,:],
-    #     [0,0],
-    #     gpu=True,
-    #     anisotropy=zToXYRatio,
-    #     diameter=10,
-    #     cellprob_threshold=-5,
-    #     flow_threshold=0.6,
-    #     # stitch_threshold=0.25,
-    #     model_type='nuclei',
-    #     min_size=1000,
-    #     do_3D=True,
-    # )
+    mask, _, _, _ = run_cellpose(
+        # np.stack((imgFiltered[:,1,:,:], np.zeros(imgFiltered[:,1,:,:].shape)), axis=1),
+        imgFiltered[:,1,:,:],
+        [0,0],
+        gpu=True,
+        anisotropy=zToXYRatio,
+        # diameter=10,
+        cellprob_threshold=-5,
+        flow_threshold=0.6,
+        # stitch_threshold=0.25,
+        model_type='nuclei',
+        min_size=1000,
+        do_3D=True,
+    )
 
-    # nNuclei = np.unique(mask).size - 1
-    # print(f'>>>> {nNuclei} of nuclei detected')
+    nNuclei = np.unique(mask).size - 1
+    print(f'>>>> {nNuclei} of nuclei detected')
     
     # outlineRGBNuclei = image_with_outlines(np.squeeze(imgResizedShaped[:,1,:,:]), maskNuclei)
 

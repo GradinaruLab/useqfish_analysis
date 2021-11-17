@@ -1,8 +1,18 @@
-from skimage import filters, feature, img_as_float32, registration, transform, morphology, segmentation
 import numpy as np
-from cellpose import transforms, utils
-from scipy import ndimage
-import tifffile
+
+from skimage.filters import gaussian, median
+from skimage.morphology import convex_hull_image
+from skimage.segmentation import expand_labels
+from skimage.transform import resize, warp
+from skimage.registration import phase_cross_correlation
+
+
+from cellpose.transforms import resize_image
+from cellpose.utils import masks_to_outlines
+
+from scipy.ndimage import white_tophat
+
+from tifffile import imread, TiffFile
 
 import gc
 from tqdm import tqdm
@@ -17,7 +27,7 @@ def image_read(filename):
     read ome-tiff file as numpy array, converted to [0.0 1.0] float32 type
     if dapi channel is not the first, bring the dapi channel to the first
     """
-    return tifffile.imread(filename)
+    return imread(filename)
     
 
 def image_gaussian_filter(img, sigma=1):
@@ -26,7 +36,7 @@ def image_gaussian_filter(img, sigma=1):
 
     for z in range(nZ):
         for c in range(nC):
-            imgFiltered[z,c,:,:] = filters.gaussian(img[z,c,:,:], sigma=sigma)
+            imgFiltered[z,c,:,:] = gaussian(img[z,c,:,:], sigma=sigma)
 
     # nZ = img.shape[0]
 
@@ -44,7 +54,7 @@ def median_filter(img):
     """
     """
     img = img[0,...]
-    filtered = filters.median(img)
+    filtered = median(img)
     # imgMedianFiltered = np.array(
     #     [filters.median(img[z]) for z in range(img.shape[0])]
     # )
@@ -90,7 +100,7 @@ def image_downsample_shape(img, resizeFactor=0.2):
     # imgdTFirst[:,:,:,0] = img[1].copy()
     # imgdTFirst[:,:,:,1] = img[0].copy()
     # imgFloat = img_as_float32(imgdTFirst)
-    imgResized = transforms.resize_image(img, rsz=resizeFactor)
+    imgResized = resize_image(img, rsz=resizeFactor)
     # zToXYRatio = zToXYRatioReal*resizeFactor
     
     _, nXResized, nYResized, _  = imgResized.shape
@@ -109,7 +119,7 @@ def background_subtraction(img, size=10, mode='nearest'):
     """
     """
     img = img[0,...]
-    filtered = ndimage.white_tophat(img, size=size, mode=mode)
+    filtered = white_tophat(img, size=size, mode=mode)
     # imgTophat = np.array(
     #     [white_tophat(img[z], size=size, mode=mode) for z in range(img.shape[0])]
     # )
@@ -123,7 +133,7 @@ def background_subtraction(img, size=10, mode='nearest'):
     # return imgTophat
     return filtered[None,...]
 
-def mask_closing(mask, selem=morphology.ball(2), expand=True, expandDist=2):
+def mask_closing(mask, expand=True, expandDist=2):
     maskClosed = np.zeros_like(mask)
 
     # for i in range(1, mask.max()+1):
@@ -142,20 +152,20 @@ def mask_closing(mask, selem=morphology.ball(2), expand=True, expandDist=2):
     for i in tqdm(range(1, mask.max()+1)):
         maskI = (mask==i)
         for z in range(maskI.shape[0]):
-            maskIHull = morphology.convex_hull_image(maskI[z])
+            maskIHull = convex_hull_image(maskI[z])
             y, x = np.nonzero(maskIHull)
             maskClosed[z,y,x] = i
         for y in range(maskI.shape[1]):
-            maskIHull = morphology.convex_hull_image(maskI[:,y,:])
+            maskIHull = convex_hull_image(maskI[:,y,:])
             z, x = np.nonzero(maskIHull)
             maskClosed[z,y,x] = i
         for x in range(maskI.shape[2]):
-            maskIHull = morphology.convex_hull_image(maskI[:,:,x])
+            maskIHull = convex_hull_image(maskI[:,:,x])
             z, y = np.nonzero(maskIHull)
             maskClosed[z,y,x] = i
 
     if expand:
-        maskClosed = segmentation.expand_labels(maskClosed, distance=expandDist)
+        maskClosed = expand_labels(maskClosed, distance=expandDist)
 
     return maskClosed
 
@@ -165,13 +175,13 @@ def mask_upsample(mask, finalShape=None):
     elif mask.ndim != len(finalShape):
         raise ValueError('dimension of final shape is not matched with input mask')
     else:
-        maskUpsampled = transform.resize(mask, finalShape, order=0, preserve_range=True)
+        maskUpsampled = resize(mask, finalShape, order=0, preserve_range=True)
         
         return maskUpsampled.astype(np.int)
 
 
 def image_with_outlines(img, mask):
-    outlines = utils.masks_to_outlines(mask)
+    outlines = masks_to_outlines(mask)
     outZ, outY, outX = np.nonzero(outlines)
     imgOutlined = np.zeros((img.shape[0], img.shape[1], img.shape[2], 3))
     imgOutlined[outZ, outY, outX] = np.array([1, 1, 1])
@@ -183,7 +193,7 @@ def image_shift(refImg, movImg):
     return shift coordinates
     """
     # refImg = refImg[0,...]
-    shift, _, _ = registration.phase_cross_correlation(refImg, movImg)
+    shift, _, _ = phase_cross_correlation(refImg, movImg)
 
     # return shift[None,...]
     return shift
@@ -199,7 +209,7 @@ def image_warp(img, shift=None):
     z, y, x = img.shape
     newZ, newY, newX = np.mgrid[:z, :y, :x]
     newCoordinates = np.array([newZ-shift[0], newY-shift[1], newX-shift[2]])
-    imgMoved = transform.warp(img, newCoordinates, mode='constant', cval=0)
+    imgMoved = warp(img, newCoordinates, mode='constant', cval=0)
 
     del newZ, newY, newX, newCoordinates
     gc.collect()
@@ -214,7 +224,7 @@ def read_ome_metadata(filePath):
 
     Returns: dictionary of parsed metadata
     """
-    with tifffile.TiffFile(filePath) as tif:
+    with TiffFile(filePath) as tif:
         imgMetadata = OMEXML(tif.ome_metadata)
     
     dictMetadata = {'nChannels': imgMetadata.image().Pixels.channel_count,
@@ -228,3 +238,4 @@ def read_ome_metadata(filePath):
     }
 
     return dictMetadata
+        

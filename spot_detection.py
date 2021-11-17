@@ -1,53 +1,11 @@
-import cv2
 import numpy as np
-from skimage import feature
+from skimage.feature import blob_log
 import faulthandler; faulthandler.enable()
-import functools
+from functools import reduce
 import operator
-from scipy.spatial import distance
+from scipy.spatial.distance import cdist
 import gc
 
-# # Setup SimpleBlobDetector parameters.
-# params = cv2.SimpleBlobDetector_Params()
-
-# # Change thresholds
-# params.minThreshold = 10
-# params.maxThreshold = 200
-
-# # Filter by Area.
-# params.filterByArea = True
-# params.minArea = 1
-# params.maxArea = 10
-
-# # Create a detector with the parameters
-# ver = (cv2.__version__).split('.')
-# if int(ver[0]) < 3 :
-# 	detector = cv2.SimpleBlobDetector(params)
-# else : 
-# 	detector = cv2.SimpleBlobDetector_create(params)
-
-# # Read image
-# im = cv2.imread("/Users/jvendemiatti/Desktop/useqfish_analysis/test images/cropped_test.tif")
-# cv2.imshow("test image", im)
-# cv2.waitKey(0)
-
-# # Set up the detector with default parameters.
-# detector = cv2.SimpleBlobDetector()
-
-# # Detect blobs.
-# keypoints = detector.detect(im)
-# print("DETECTED")
-# print(keypoints)
-
-# # Draw detected blobs as red circles.
-# # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-# im_with_keypoints = cv2.drawKeypoints(im, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
-
-# # Show keypoints
-# cv2.imshow("Keypoints", im_with_keypoints)
-# cv2.waitKey(0)
-
-# # img = tifffile.imread(filename)
 
 def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, threshold=0.1, overlap=0):
     """
@@ -58,7 +16,7 @@ def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, thresh
 
     spotCoordinates = []
     for z in range(img.shape[0]):
-        spots = feature.blob_log(
+        spots = blob_log(
             np.squeeze(img[z]),
             min_sigma=minSigma,
             max_sigma=maxSigma,
@@ -72,7 +30,7 @@ def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, thresh
 
         spotCoordinates.append(list(spots))
             
-    spotCoordinates = functools.reduce(operator.iconcat, spotCoordinates, [])   # make a flatten list
+    spotCoordinates = reduce(operator.iconcat, spotCoordinates, [])   # make a flatten list
     spotCoordinates = np.array(spotCoordinates)
     # print(f'spotCoordinates.type: {spotCoordinates.dtype}')
     if spotCoordinates.shape[0] > 0:
@@ -114,7 +72,7 @@ def spot_stitch_3d(spotCoordinates, radius):
             else:
                 preIdx = np.where(spotCoordinates[:,0] == z-1)[0]
                 if preIdx.size > 0:
-                    distances = distance.cdist(spotCoordinates[preIdx, 1:3], spotCoordinates[spotIdx, 1:3])
+                    distances = cdist(spotCoordinates[preIdx, 1:3], spotCoordinates[spotIdx, 1:3])
                     # print(f'distances.shape: {distances.shape}')
                     minDist = np.amin(distances, axis=0)
                     # print(f'minDist.shape: {minDist.shape}')
