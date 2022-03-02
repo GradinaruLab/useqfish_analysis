@@ -3,13 +3,15 @@ from cellpose.models import Cellpose
 # import numpy as np
 from skimage import img_as_float32
 
+# import logging
+# logging.getLogger('cellpose').setLevel(logging.WARNING)
 
 def run_cellpose(
     img, 
     channels, 
     gpu=True, 
-    model_type='cyto', 
-    diameter=30, 
+    model_type='cyto2', 
+    diameter=30., 
     device=None, 
     anisotropy=None,
     stitch_threshold=0.25,
@@ -46,7 +48,7 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     imgNormalized = image_normalize_layers(imgResizedShaped)
     imgFiltered = image_gaussian_filter(imgNormalized, sigma=2)
 
-    medianDiameters = 30
+    medianDiameters = np.float32(30.)
 
     mask, _, _, _ = run_cellpose(
         imgFiltered,
@@ -55,6 +57,7 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
         # device=mx.gpu(1),
         anisotropy=zToXYRatio,
         diameter=medianDiameters,
+        # diameter=None,
         cellprob_threshold=-5,
         flow_threshold=0.6,
         min_size=1000, #min_size is not actually working well. how does it work with 3d, stitch_threshold
@@ -101,13 +104,16 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     # maskConvex = mask_convex_hull(mask)
     maskClosed = mask_closing(mask.copy())
     maskUpsampled = mask_upsample(maskClosed, (img.shape[0], img.shape[1], img.shape[2]))
-    # maskUpsampledOutlined = utils.masks_to_outlines(maskUpsampled)
 
-    del imgResizedShaped, imgNormalized, imgFiltered, mask, maskClosed
+    # print(f'>>>> expanding cell labels')
+    # maskExpanded = mask_expand(maskUpsampled, expandDist=2)
+    maskExpanded = maskUpsampled
+    
+    del imgResizedShaped, imgNormalized, imgFiltered, mask, maskClosed, maskUpsampled
     gc.collect()
 
     # return maskUpsampled, maskUpsampledOutlined, zToXYRatioReal, nCells
-    return maskUpsampled, zToXYRatioReal, nCells
+    return maskExpanded, zToXYRatioReal, nCells
 
 
 # def confine_cell_detection():

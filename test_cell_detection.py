@@ -5,7 +5,7 @@
 from cell_detection_dapi import *
 from spot_detection import *
 from image_manipulation import *
-from params import *
+from params_smhcr import *
 
 import pandas as pd
 # from pylab import *
@@ -61,5 +61,5 @@ zarr.save(
     imgCells=img_cells,
     cellLabels=cellLabels,
     zToXYRatioReal=zToXYRatioReal,
-    nR=nR
+    nR=nR,
 )

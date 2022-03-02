@@ -18,6 +18,7 @@ from glob import glob
 import dask
 import dask.array as da
 from dask.diagnostics import ProgressBar
+import dask_image as di
 import zarr
 
 from warnings import filterwarnings; filterwarnings("ignore")
@@ -47,6 +48,7 @@ imgMetadata = read_ome_metadata(filenames[roundRef])
 zToXYRatioReal = imgMetadata['zRealSize']/imgMetadata['xRealSize']
 nC, size_z, size_y, size_x = imgReference.shape
 
+
 # imax = [0 for i in range(nC)]
 # imin = [65000 for i in range(nC)]
 # for filename in filenames[:roundRef]:
@@ -61,16 +63,8 @@ nC, size_z, size_y, size_x = imgReference.shape
 # print(f'max values for each channel: {imax}')
 # print(f'min values for each channel: {imin}')
 
-# thresholds = [th / 65535 for th in absolute_thresholds]
-thresholds = absolute_thresholds
-# thresholds = []
-# for ch in range(1, nC):
-#     if ch == cellch:
-#         thresholds.append(250.)
-#     else:
-#         thresholds.append(np.percentile(image_mip(imgReference[ch], axis=0), 99.99)+100.)
+thresholds = [th / 65535 for th in absolute_thresholds]
 print(f'thresholds: {thresholds}')
-
 
 print(f'>> STEP 1. Cell detection -')
 img_cells = img_as_float32(np.stack((imgReference[cellch], imgReference[0]), axis=3))
@@ -92,14 +86,14 @@ for filename in filenames[:roundRef]:
     print('\n')
     print(filename)
 
+    img = dast
     img = dask.delayed(image_read)(filename)
     # img_scaled = [dask.delayed(image_rescale_intensity)(img[c], (imin_ch, imax_ch)) for c, (imin_ch, imax_ch) in enumerate(zip(imin, imax))]
-    # img = [dask.delayed(img_as_float32)(img[c]) for c in range(nC)]
-
+    img = [dask.delayed(img_as_float32)(img[c]) for c in range(nC)]
     
     print(f'>> STEP 2. registration - ')
 
-    dapi = img_as_float32(img[0].compute())
+    dapi = img[0].compute()
     dapi_cropped = image_crop(dapi, shift_window_size)
     round_shift = image_shift(dapi_reference_cropped, dapi_cropped)
     # round_shift = image_shift(imgReference[0], dapi)
@@ -123,27 +117,19 @@ for filename in filenames[:roundRef]:
     print(f'>> STEP 3. Spot detection -')
     # set up dask for running in parallel
     
-    # daimg = [da.from_delayed(ch, dtype=np.float32, shape=dapi.shape) for ch in img[1:]]
-    daimg = [da.from_delayed(img[c].astype(np.float32), dtype=np.float32, shape=dapi.shape) for c in range(1, nC)]
-    # daimg = [ndfilters.median_filter(ch) for ch in daimg]
-    # orig = daimg[0].compute()
-
+    daimg = [da.from_delayed(ch, dtype=np.float32, shape=dapi.shape) for ch in img[1:]]
     daimg = [ch.rechunk((1, -1, -1)) for ch in daimg]
-    # # print(f'chunk size: {daimg[0].chunksize}')
-    # daimg = [da.map_blocks(median_filter, ch) for ch in daimg]
-    # med = daimg[0].compute()
-
-    daimg = [da.map_blocks(background_subtraction, ch, size=20) for ch in daimg]
+    # print(f'chunk size: {daimg[0].chunksize}')
+    daimg = [da.map_blocks(median_filter, ch) for ch in daimg]
+    # daimg = [da.map_blocks(background_subtraction, ch, size=100) for ch in daimg]
     daimg = [ch.rechunk((-1, -1, -1)) for ch in daimg]
-    # # print(f'chunk size: {daimg[0].chunksize}')
+    # print(f'chunk size: {daimg[0].chunksize}')
 
-    # print(np.amax(orig), orig.dtype, np.amax(med), med.dtype, np.amax(wth), wth.dtype)
-    
     img_delayed = [dask.delayed(ch) for ch in daimg]
 
     spots = [
         dask.delayed(blob_detection)(
-            ch, shift=shift, minSigma=sigma[0], maxSigma=sigma[-1], numSigma=len(sigma), threshold=th    #default threshold=0.005
+            ch, shift=shift, minSigma=sigma, maxSigma=sigma, numSigma=1, threshold=th    #default threshold=0.005
         )
         for ch, shift, th in zip(img_delayed, shifts[1:], thresholds)
     ]
@@ -167,8 +153,7 @@ zarr.save(
     zToXYRatioReal=zToXYRatioReal,
     shifts_allrounds=np.array(shifts_allrounds),
     dapis_shifted=np.array(dapis_shifted),
-    nR=nR,
-    thresholds=np.array(thresholds)
+    nR=nR
 )
 
 print(f'>> STEP 4. Save results -')
@@ -181,7 +166,6 @@ for r, spots_assigned in enumerate(spots_assigned_allrounds):
 
 spots_results = np.array(spots_results)
 print(f'>>>> Total {spots_results.shape[0]} spots detected')
-print(f'>>>> intensity threshold: {thresholds}')
 # print(f'{spotCoords.shape}')
 
 resultDf = pd.DataFrame({

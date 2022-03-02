@@ -70,23 +70,25 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     # outlineRGB = image_with_outlines(np.squeeze(imgResizedShaped[:,0,:,:]), mask)
 
     # # nuclei detection
-    mask, _, _, _ = run_cellpose(
-        # np.stack((imgFiltered[:,1,:,:], np.zeros(imgFiltered[:,1,:,:].shape)), axis=1),
-        imgFiltered[:,1,:,:],
-        [0,0],
-        gpu=True,
-        anisotropy=zToXYRatio,
-        # diameter=10,
-        cellprob_threshold=-5,
-        flow_threshold=0.6,
-        # stitch_threshold=0.25,
-        model_type='nuclei',
-        min_size=1000,
-        do_3D=True,
-    )
+    # mask_nuclei, _, _, estimated_diameter_nuclei = run_cellpose(
+    #     # np.stack((imgFiltered[:,1,:,:], np.zeros(imgFiltered[:,1,:,:].shape)), axis=1),
+    #     imgFiltered[:,1,:,:],
+    #     [0,0],
+    #     gpu=True,
+    #     anisotropy=zToXYRatio,
+    #     # diameter=10,
+    #     diameter=None,
+    #     cellprob_threshold=-5,
+    #     flow_threshold=0.6,
+    #     # stitch_threshold=0.25,
+    #     model_type='nuclei',
+    #     min_size=1000,
+    #     do_3D=True,
+    # )
 
-    nNuclei = np.unique(mask).size - 1
-    print(f'>>>> {nNuclei} of nuclei detected')
+    # nNuclei = np.unique(mask_nuclei).size - 1
+    # print(f'>>>> {nNuclei} of nuclei detected')
+    # print(f'>>>> median of diameters: {estimated_diameter_nuclei}')
     
     # outlineRGBNuclei = image_with_outlines(np.squeeze(imgResizedShaped[:,1,:,:]), maskNuclei)
 
@@ -104,11 +106,14 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     maskUpsampled = mask_upsample(maskClosed, (img.shape[0], img.shape[1], img.shape[2]))
     # maskUpsampledOutlined = utils.masks_to_outlines(maskUpsampled)
 
-    del imgResizedShaped, imgNormalized, imgFiltered, mask, maskClosed
+    # mask_nuclei_closed = mask_closing(mask_nuclei.copy())
+    # mask_nuclei_upsampled = mask_upsample(mask_nuclei_closed, (img.shape[0], img.shape[1], img.shape[2]))
+
+    del imgResizedShaped, imgNormalized, imgFiltered, mask, maskClosed, 
     gc.collect()
 
     # return maskUpsampled, maskUpsampledOutlined, zToXYRatioReal, nCells
-    return maskUpsampled, zToXYRatioReal, nCells
+    return maskUpsampled, zToXYRatioReal, nCells 
 
 
 # def confine_cell_detection():

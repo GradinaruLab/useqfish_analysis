@@ -5,7 +5,7 @@
 from cell_detection import *
 from spot_detection import *
 from image_manipulation import *
-from params import *
+from params_smhcr import *
 
 import pandas as pd
 from pylab import *
