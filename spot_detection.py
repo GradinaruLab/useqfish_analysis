@@ -5,6 +5,7 @@ from functools import reduce
 import operator
 from scipy.spatial.distance import cdist
 import gc
+import math
 
 
 def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, threshold=0.1, overlap=0):
@@ -22,6 +23,7 @@ def blob_detection(img, shift=None, minSigma=1, maxSigma=10, numSigma=10, thresh
             max_sigma=maxSigma,
             num_sigma=numSigma,
             threshold=threshold,
+            # threshold_rel=threshold_rel,
             overlap=overlap
         ).astype(np.uint16)
 
@@ -160,3 +162,10 @@ def spot_warp(coords, shift=None):
 
     newCoords = np.column_stack((coords[:,0]+shift[0], coords[:,1]+shift[1], coords[:,2]+shift[2], coords[:,3]))
     return newCoords
+
+
+def isnoise(pre_coords, cur_coords, dist_threshold=1):
+    if math.dist(pre_coords, cur_coords) <= dist_threshold:
+        return True
+    else:
+        return False

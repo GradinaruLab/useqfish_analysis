@@ -1,10 +1,12 @@
 import numpy as np
 
-from skimage.filters import gaussian, median
-from skimage.morphology import convex_hull_image
+from skimage.filters import gaussian, median, threshold_isodata
+from skimage.morphology import convex_hull_image, square
 from skimage.segmentation import expand_labels
-from skimage.transform import resize, warp
+from skimage.transform import resize, warp, EuclideanTransform, AffineTransform
 from skimage.registration import phase_cross_correlation
+from skimage.util import img_as_float32
+from skimage.exposure import rescale_intensity
 
 
 from cellpose.transforms import resize_image
@@ -28,7 +30,6 @@ def image_read(filename):
     if dapi channel is not the first, bring the dapi channel to the first
     """
     return imread(filename)
-    
 
 def image_gaussian_filter(img, sigma=1):
     imgFiltered = np.zeros_like(img)
@@ -49,12 +50,23 @@ def image_gaussian_filter(img, sigma=1):
 def image_mip(img, axis=0):
     return img.max(axis)
 
+def image_rescale_intensity(img, out_range='dtype'):
+    return rescale_intensity(img, out_range=out_range).astype(np.float32)
+    # print(f'out_range: {out_range}, img_scaled.max: {img_scaled.max()}')
+    # return np.multiply(img, 1. / out_range[1], dtype=np.float32)
+
+def image_threshold(img, percentile=99):
+    percentile_intensity = np.percentile(img, percentile)
+    img_above_percentile_intensity = img[img > percentile_intensity]
+    return np.mean(img_above_percentile_intensity)
+
+    return threshold_isodata(img, nbins=65536, return_all=True)
 
 def median_filter(img):
     """
     """
     img = img[0,...]
-    filtered = median(img)
+    filtered = median(img, square(3))
     # imgMedianFiltered = np.array(
     #     [filters.median(img[z]) for z in range(img.shape[0])]
     # )
@@ -133,7 +145,7 @@ def background_subtraction(img, size=10, mode='nearest'):
     # return imgTophat
     return filtered[None,...]
 
-def mask_closing(mask, expand=True, expandDist=2):
+def mask_closing(mask):
     maskClosed = np.zeros_like(mask)
 
     # for i in range(1, mask.max()+1):
@@ -162,12 +174,16 @@ def mask_closing(mask, expand=True, expandDist=2):
         for x in range(maskI.shape[2]):
             maskIHull = convex_hull_image(maskI[:,:,x])
             z, y = np.nonzero(maskIHull)
-            maskClosed[z,y,x] = i
-
-    if expand:
-        maskClosed = expand_labels(maskClosed, distance=expandDist)
+            maskClosed[z,y,x] = i   
 
     return maskClosed
+
+def mask_expand(mask, expandDist=1):
+    maskExpanded = np.zeros_like(mask)
+    for z in tqdm(range(mask.shape[0])):
+        maskExpanded[z] = expand_labels(mask[z], distance=expandDist)
+    return maskExpanded.astype(np.uint16)
+
 
 def mask_upsample(mask, finalShape=None):
     if finalShape is None:
@@ -177,7 +193,7 @@ def mask_upsample(mask, finalShape=None):
     else:
         maskUpsampled = resize(mask, finalShape, order=0, preserve_range=True)
         
-        return maskUpsampled.astype(np.int)
+        return maskUpsampled.astype(np.uint16)
 
 
 def image_with_outlines(img, mask):
@@ -192,11 +208,41 @@ def image_shift(refImg, movImg):
     """
     return shift coordinates
     """
-    # refImg = refImg[0,...]
-    shift, _, _ = phase_cross_correlation(refImg, movImg)
+    # # refImg = refImg[0,...]
+    # shift, _, _ = phase_cross_correlation(refImg, movImg)
 
-    # return shift[None,...]
-    return shift
+    # # return shift[None,...]
+    # return shift
+
+    if refImg.shape != movImg.shape and refImg.size > movImg.size:
+        rz, ry, rx = refImg.shape
+        mz, my, mx = movImg.shape
+        movImg = np.pad(
+            movImg,
+            ((0, rz-mz), (0, ry-my), (0, rx-mx)),
+            mode='mean'
+        )
+        print(f'refImg.shape: {refImg.shape}, movImg.shape: {movImg.shape}')
+
+    shift_zx, _, _ = phase_cross_correlation(
+        img_as_float32(image_mip(refImg, axis=1)), 
+        img_as_float32(image_mip(movImg, axis=1)), 
+        upsample_factor=10,
+    )
+    shift_zy, _, _ = phase_cross_correlation(
+        img_as_float32(image_mip(refImg, axis=2)), 
+        img_as_float32(image_mip(movImg, axis=2)), 
+        upsample_factor=10,
+    )
+    shift = np.array([(shift_zx[0]+shift_zy[0])/2, shift_zy[1], shift_zx[1]])
+
+    if (np.abs(shift_zx[1]) > 50) | (np.abs(shift_zy[1]) > 50):
+        shift, _, _ = phase_cross_correlation(refImg, movImg)
+
+    return shift.astype(np.float32)
+    # print(shift_zx, shift_zy)
+    # shift = np.array([(shift_zx[0]+shift_zy[0])/2, shift_zy[1], shift_zx[1]]).astype(np.float32)
+    # return shift
 
 
 def image_warp(img, shift=None):

@@ -34,16 +34,17 @@ args = my_parser.parse_args()
 path = args.Path
 ismip = args.mip
 
-cmap = get_cmap('hsv', nR*nC)
+cmap = get_cmap('rainbow', nR*nC)
 # colors = [matplotlib.colors.rgb2hex(c) for c in cmap.colors]
 colors = [rgb2hex(cmap(i)) for i in range(cmap.N)]
-print(colors)
-# colors.reverse()
 
 # stitching_coords = np.array(stitching_coords)
 stitching_coords = np.array(stitching_coords) - np.array(stitching_coords[0])
 stitching_coords = list(stitching_coords)
 montage_w, montage_h = stitching_shape
+
+overlapped_region = np.array(img_size)-np.array(img_size)*stitching_overlap/100
+
 
 if ismip:
     filepath = os.path.join(path, '*.xlsx')
@@ -59,24 +60,40 @@ if ismip:
         if w%2 == 0:
             for h in range(montage_h):
                 spot = pd.read_excel(filenames[file_index], index_col=0)
-                spot['x-coord'] = spot['x-coord'] + w*img_size[0] - w*img_size[0]*stitching_overlap/100
-                spot['y-coord'] = -spot['y-coord'] + h*img_size[1] - h*img_size[1]*stitching_overlap/100
+                spot_notoverlapped = spot
+                if (w == montage_w-1) & (h < montage_h):
+                    spot_notoverlapped = spot.loc[spot['y-coord']<overlapped_region[1]]
+                if (w < montage_w-1) & (h == montage_h-1):
+                    spot_notoverlapped = spot.loc[spot['x-coord']<overlapped_region[0]]
+                if (w < montage_w-1) & (h < montage_h-1):
+                    spot_notoverlapped = spot.loc[(spot['x-coord']<overlapped_region[0]) & (spot['y-coord']<overlapped_region[1])]
+                
+                spot_notoverlapped['x-coord'] = spot_notoverlapped['x-coord'] + w*img_size[0] - w*img_size[0]*stitching_overlap/100
+                spot_notoverlapped['y-coord'] = -spot_notoverlapped['y-coord'] + h*img_size[1] - h*img_size[1]*stitching_overlap/100
                 if w==montage_w-1:
-                    spot['x-coord'] = spot['x-coord'] - last_overlap[0]
+                    spot_notoverlapped['x-coord'] = spot_notoverlapped['x-coord'] - last_overlap[0]
                 if h==montage_h-1:
-                    spot['y-coord'] = spot['y-coord'] - last_overlap[1]
-                spots.append(spot)
+                    spot_notoverlapped['y-coord'] = spot_notoverlapped['y-coord'] - last_overlap[1]
+                spots.append(spot_notoverlapped)
                 file_index = file_index + 1
         else:
-            for h in range(4, -1, -1):
+            for h in range(montage_h-1, -1, -1):
                 spot = pd.read_excel(filenames[file_index], index_col=0)
-                spot['x-coord'] = spot['x-coord'] + w*img_size[0] - w*img_size[0]*stitching_overlap/100
-                spot['y-coord'] = -spot['y-coord'] + h*img_size[1] - h*img_size[1]*stitching_overlap/100
+                spot_notoverlapped = spot
+                if (w == montage_w-1) & (h < montage_h-1):
+                    spot_notoverlapped = spot.loc[spot['y-coord']<overlapped_region[1]]
+                if (w < montage_w-1) & (h == montage_h-1):
+                    spot_notoverlapped = spot.loc[spot['x-coord']<overlapped_region[0]]
+                if (w < montage_w-1) & (h < montage_h-1):
+                    spot_notoverlapped = spot.loc[(spot['x-coord']<overlapped_region[0]) & (spot['y-coord']<overlapped_region[1])]
+
+                spot_notoverlapped['x-coord'] = spot_notoverlapped['x-coord'] + w*img_size[0] - w*img_size[0]*stitching_overlap/100
+                spot_notoverlapped['y-coord'] = -spot_notoverlapped['y-coord'] + h*img_size[1] - h*img_size[1]*stitching_overlap/100
                 if w==montage_w-1:
-                    spot['x-coord'] = spot['x-coord'] - last_overlap[0]
+                    spot_notoverlapped['x-coord'] = spot_notoverlapped['x-coord'] - last_overlap[0]
                 if h==montage_h-1:
-                    spot['y-coord'] = spot['y-coord'] - last_overlap[1]
-                spots.append(spot)
+                    spot_notoverlapped['y-coord'] = spot_notoverlapped['y-coord'] - last_overlap[1]
+                spots.append(spot_notoverlapped)
                 file_index = file_index + 1
 
     for spot, coord in zip(spots, stitching_coords):
@@ -95,11 +112,14 @@ if ismip:
 
 
     viewer = napari.Viewer()
+    cind = 0
     for r, spots_assigned in enumerate(spots_assigned_allrounds):
         for c, spots in enumerate(spots_assigned):
             spots = np.array(spots)
             # color = colors[nC*r+c]
-            color = sample(colors,1)
+            # color = sample(colors,1)
+            color = colors[cind]
+            # print(f'cind: {cind}')
             if spots.shape[0] > 0:
                 viewer.add_points(
                     spots,
@@ -110,6 +130,8 @@ if ismip:
                     name=f'{r+1} round, {c+1} ch',
                     # visible=False
                 )
+                cind = cind + 1
+                  
 
     napari.run()
 

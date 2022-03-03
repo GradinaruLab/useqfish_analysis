@@ -9,7 +9,7 @@ from glob import glob
 import os
 
 from params import *
-from matplotlib.pyplot import rc_context
+from matplotlib.pyplot import rc_context, savefig
 
 from converting_anndata import *
 
@@ -28,7 +28,7 @@ def anndata_copy_attributes(src_anndata, dtn_anndata):
 
 ## collect excel files from all positions
 # path = './expression_matrices/210828/220117_analyzed'
-path = './expression_matrices/h5ad_old'
+path = './expression_matrices/211229/old'
 filepath = os.path.join(path, '*.h5ad')    
 filenames = sorted(glob(filepath), key=os.path.basename)
 print(filenames)
@@ -49,7 +49,7 @@ else:
 
 print(adata)
 print(adata.var_names)
-# print(adata.obs['position'])
+print(adata.obs['position'])
 
 print(f'>>> total cell number: {adata.n_obs}')
 
@@ -57,6 +57,7 @@ print(f'>>> total cell number: {adata.n_obs}')
 
 adata_virus = adata[:, adata.var_names.isin(virus_list)]
 adata_endo = adata[:, ~adata.var_names.isin(virus_list)]
+
 total_counts_per_cell = np.sum(adata_endo.X, axis=1)
 poor_expression_threshold = np.percentile(total_counts_per_cell, 50)
 if poor_expression_threshold == 0:
@@ -71,8 +72,9 @@ print(f'poor_expression_threshold: {poor_expression_threshold}')
 # print(f'cell_outliers_threshold: {cell_outliers_threshold}')
 
 cell_subset, number_per_cell = sc.pp.filter_cells(adata_endo, min_counts=poor_expression_threshold, inplace=False)
-# cell_subset, number_per_cell = sc.pp.filter_cells(adata_endo, min_genes=1, inplace=False)
-gene_subset, number_per_gene = sc.pp.filter_genes(adata_endo, min_counts=1, inplace=False)
+# cell_subset2, _ = sc.pp.filter_cells(adata_endo, max_genes=cell_outliers_threshold, inplace=False)
+# cell_subset = cell_subset & cell_subset2
+gene_subset, number_per_gene = sc.pp.filter_genes(adata_endo, min_cells=3, inplace=False)
 
 
 adata_endo = adata_endo[cell_subset, gene_subset]
@@ -82,17 +84,17 @@ adata_virus = adata_virus[cell_subset, :]
 print(f'>>> total cells passed the filter: {adata_endo.n_obs}')
 
 # %%
-adata_endo_sim = scex.pp.scrublet_simulate_doublets(adata_endo)
-adata_endo = scex.pp.scrublet(
-    adata_endo, 
-    adata_sim=adata_endo_sim,
-    # n_prin_comps=3, 
-    n_prin_comps=10,
-    copy=True
-)
-cell_singlet = ~adata_endo.obs['predicted_doublet'].fillna(False).astype(bool)
-adata_endo = adata_endo[cell_singlet]
-adata_virus = adata_virus[cell_singlet]
+# adata_endo_sim = scex.pp.scrublet_simulate_doublets(adata_endo)
+# adata_endo = scex.pp.scrublet(
+#     adata_endo, 
+#     adata_sim=adata_endo_sim,
+#     # n_prin_comps=3, 
+#     n_prin_comps=10,
+#     copy=True
+# )
+# cell_singlet = ~adata_endo.obs['predicted_doublet'].fillna(False).astype(bool)
+# adata_endo = adata_endo[cell_singlet]
+# adata_virus = adata_virus[cell_singlet]
 
 # adata_endo = sc.AnnData(datas.iloc[:,n_variants:])
 # adata_virus = sc.AnnData(datas.iloc[:,:n_variants])
@@ -105,24 +107,41 @@ print(f'>>> total singlet cells: {adata_endo.n_obs}')
 # adata_endo.raw = adata_endo
 
 sc.pp.normalize_total(adata_endo)
-# sc.pp.log1p(adata_endo)
+sc.pp.log1p(adata_endo)
 adata_endo.raw = adata_endo
 print(adata_endo.X.max(), adata_endo.X.min())
-# sc.pp.scale(adata_endo)
+sc.pp.scale(adata_endo)
 print(adata_endo.X.max(), adata_endo.X.min())
 # sc.pp.highly_variable_genes(adata_endo)
-# sc.pp.pca(adata_endo)
 
-# %%
-# sc.pp.neighbors(adata_endo, use_rep='X_pca')
-sc.pp.neighbors(adata_endo)
+sc.pp.pca(adata_endo)
+sc.pp.neighbors(adata_endo, use_rep='X_pca', n_neighbors=50)
 sc.tl.umap(adata_endo)
-# sc.tl.tsne(adata_endo, use_rep='X_pca')
-sc.tl.tsne(adata_endo)
+sc.tl.tsne(adata_endo, use_rep='X_pca')
+
+# sc.pp.neighbors(adata_endo)
+# sc.tl.umap(adata_endo)
+# sc.tl.tsne(adata_endo)
 
 # %%
 sc.tl.leiden(adata_endo, resolution=leiden_resolution)
 sc.tl.dendrogram(adata_endo, groupby='leiden')
+
+
+# %%
+# clustering resolution optimization
+
+# aggregat poorly classified clusters
+# total_counts = np.sum(adata_endo.raw.X, axis=1)
+# poor_threshold = np.percentile(total_counts, 20)
+# print(f'poor_threshold: {poor_threshold}')
+
+# labels = adata_endo.obs['leiden']
+# print(labels)
+
+
+
+# print(number_of_clusters)
 
 
 # %%
@@ -182,14 +201,6 @@ with rc_context({'figure.figsize': (15, 15)}):
         # log=True
     )
     sc.pl.heatmap(
-        adata_endo,
-        adata_endo.var_names, 
-        groupby='leiden', 
-        cmap='viridis', 
-        dendrogram=True,
-        swap_axes=True,
-    )
-    sc.pl.heatmap(
         adata_virus, 
         adata_virus.var_names, 
         groupby='leiden', 
@@ -218,8 +229,7 @@ with rc_context({'figure.figsize': (15, 15)}):
     sc.pl.matrixplot(
         adata_endo,
         # adata_endo.var_names,
-        # gene_list_ordered[6:],
-        ['slc17a7', 'gad1', 'pvalb', 'sst', 'vip', 'gja1', 'mbp', 'msr1', 'hexb', 'cldn5', 'acta2'],
+        gene_list_ordered[6:],
         'leiden',
         swap_axes=True,
         dendrogram=True,
@@ -227,16 +237,6 @@ with rc_context({'figure.figsize': (15, 15)}):
         vmax=1,
         vmin=-1,
         cmap='bwr'
-    )
-    sc.pl.matrixplot(
-        adata_endo,
-        # adata_endo.var_names,
-        # gene_list_ordered[6:],
-        ['slc17a7', 'gad1', 'pvalb', 'sst', 'vip', 'gja1', 'mbp', 'msr1', 'hexb', 'cldn5', 'acta2'],
-        'leiden',
-        swap_axes=True,
-        dendrogram=True,
-        cmap='viridis'
     )
     
     sc.pl.matrixplot(
@@ -298,49 +298,63 @@ s = sns.heatmap(
 s.set(xlabel='leiden', ylabel='position')
 
 # %%
-cluster_model = AgglomerativeClustering(n_clusters=4).fit(position_by_cluster_norm.T)
-position_predicted = cluster_model.labels_
-idx = np.argsort(position_predicted)
-print(idx)
-position_by_cluster_norm_sorted = position_by_cluster_norm[:, idx]
-s = sns.heatmap(data=position_by_cluster_norm_sorted, cmap='viridis', xticklabels=idx)
+s = sns.clustermap(
+    data=position_by_cluster_norm,
+    cmap='viridis',
+    yticklabels=active_position,
+    row_cluster=False,
+    method='ward',
+    vmax=0.5
+)
+s.fig.savefig('./figures/position_cluster.svg', dpi=600)
 
-leiden_idx = [str(i) for i in idx]
-print(adata_endo.var_names)
+# %%
+leiden_idx_reordered = s.dendrogram_col.reordered_ind
+leiden_idx_reordered = [str(idx) for idx in leiden_idx_reordered]
 with rc_context({'figure.figsize': (15, 15)}):    
     img = sc.pl.MatrixPlot(
         adata_endo,
         # adata_endo.var_names,
         gene_list_ordered[6:],
         'leiden',
-        categories_order=leiden_idx,
+        categories_order=leiden_idx_reordered,
         use_raw=False,
         vmax=1,
         vmin=-1,
         cmap='bwr'
     ).swap_axes()
     img.show()
-    # img.savefig('./figures/cortex_endo.svg', format='svg')
+    img.savefig('./figures/region_endo.svg', format='svg')
+
+    img = sc.pl.MatrixPlot(
+        adata_endo,
+        gene_list_ordered[6:],
+        'leiden',
+        categories_order=leiden_idx_reordered,
+        cmap='viridis'
+    ).swap_axes()
+    img.show()
+    img.savefig('./figures/region_endo_raw.svg', format='svg')
 
     img = sc.pl.MatrixPlot(
         adata_virus,
         ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8'],
         'leiden',
-        categories_order=leiden_idx,
+        categories_order=leiden_idx_reordered,
         standard_scale='obs',
     ).style(cmap='Blues').swap_axes()
     img.show()
-    # img.savefig('./figures/cortex_virus_obs.svg', format='svg')
+    img.savefig('./figures/region_virus_obs.svg', format='svg')
 
     img = sc.pl.MatrixPlot(
         adata_virus,
         ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8'],
         'leiden',
-        categories_order=leiden_idx,
+        categories_order=leiden_idx_reordered,
         standard_scale='var',
     ).style(cmap='Reds').swap_axes()
     img.show()
-    # img.savefig('./figures/cortex_virus_var.svg', format='svg')
+    img.savefig('./figures/region_virus_var.svg', format='svg')
 # %%
 # sc.tl.rank_genes_groups(adata_endo, groupby='leiden', method='wilcoxon')
 # sc.pl.rank_genes_groups_matrixplot(adata_endo, n_genes=1, use_raw=False, vmin=-2, vmax=2, cmap='bwr')

@@ -40,10 +40,11 @@ cells = load(os.path.join(path, 'result_images.zarr'))
 zToXYRatioReal = cells['zToXYRatioReal']
 imgCells = cells['imgCells']
 cellLabels = cells['cellLabels']
-cellOutlines = cells['cellOutlines']
+# cellOutlines = cells['cellOutlines']
 shifts_allrounds = cells['shifts_allrounds']
 dapis_shifted = cells['dapis_shifted']
 nR = cells['nR']
+thresholds = cells['thresholds']
 
 spots = pd.read_excel(os.path.join(path, 'result.xlsx'), index_col=0).astype(np.uint16)
 spots_assigned_allrounds = []
@@ -61,7 +62,11 @@ filenames = sorted(glob(filepath), key=os.path.basename)
 cmap = get_cmap('rainbow', nR*nC)
 # colors = [matplotlib.colors.rgb2hex(c) for c in cmap.colors]
 colors = [rgb2hex(cmap(i)) for i in range(cmap.N)]
-print(colors)
+
+print(f'# of cells detected: {cellLabels.max()}')
+print(f'spot detection thresholds: {thresholds}')
+
+
 
 if ismip:
 
@@ -134,7 +139,7 @@ if ismip:
                     # symbol='ring',
                     size=10,
                     name=f'{r+1} round, {c+1} ch',
-                    # visible=False
+                    visible=False
                 )
 
 
@@ -154,8 +159,8 @@ else:   # 3d visualization
             name=f'{r+1} round dapi',
             scale=zyxScale,
             # contrast_limits=[dapis_shifted[r].min(), dapis_shifted[r].max()],
-            multiscale=False,
-            visible=False
+            multiscale=False
+            # visible=False
         )
     # napari.run()
     
@@ -179,7 +184,8 @@ else:   # 3d visualization
         cellLabels,
         name='cell labels',
         scale=zyxScale,
-        multiscale=False
+        multiscale=False,
+        visible=False
     )
 
     if len(filenames) > 0:
@@ -209,7 +215,7 @@ else:   # 3d visualization
                     name=f'{r+1} round, {c+1} ch',
                     scale=zyxScale,
                     blending='additive',
-                    # visible=False
+                    visible=False
                 )
 
     napari.run()
