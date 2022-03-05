@@ -39,11 +39,6 @@ def image_gaussian_filter(img, sigma=1):
         for c in range(nC):
             imgFiltered[z,c,:,:] = gaussian(img[z,c,:,:], sigma=sigma)
 
-    # nZ = img.shape[0]
-
-    # for z in range(nZ):
-    #     imgFiltered[z, :, :] = filters.gaussian(img[z, : :], sigma=sigma)
-    
     return imgFiltered
 
 
@@ -52,30 +47,18 @@ def image_mip(img, axis=0):
 
 def image_rescale_intensity(img, out_range='dtype'):
     return rescale_intensity(img, out_range=out_range).astype(np.float32)
-    # print(f'out_range: {out_range}, img_scaled.max: {img_scaled.max()}')
-    # return np.multiply(img, 1. / out_range[1], dtype=np.float32)
 
 def image_threshold(img, percentile=99):
     percentile_intensity = np.percentile(img, percentile)
     img_above_percentile_intensity = img[img > percentile_intensity]
     return np.mean(img_above_percentile_intensity)
 
-    return threshold_isodata(img, nbins=65536, return_all=True)
-
 def median_filter(img):
     """
     """
     img = img[0,...]
     filtered = median(img, square(3))
-    # imgMedianFiltered = np.array(
-    #     [filters.median(img[z]) for z in range(img.shape[0])]
-    # )
-    # imgMedianFiltered = np.zeros_like(img)
-    # for z in range(img.shape[0]):
-    #     imgMedianFiltered[z] = filters.median(img[z])
 
-    # return imgMedianFiltered[None,...]
-    # return imgMedianFiltered
     return filtered[None,...]
 
 
@@ -93,27 +76,12 @@ def image_normalize_layers(img):
             stdLayer = np.std(flattenLayer[np.nonzero(flattenLayer)])
             imgNormalized[z,c,:,:] = meanTotal[c] + (img[z,c,:,:] - meanLayer) * (stdTotal[c]/stdLayer)
 
-    # nZ, nY, nX = img.shape
-    # meanTotal = np.mean(img.ravel()[np.nonzero(img.ravel())])
-    # stdTotal = np.std(img.ravel()[np.nonzero(img.ravel())])
-
-    # for z in range(nZ):
-    #     flattenLayer = img[z,:,:].ravel()
-    #     meanLayer = np.mean(flattenLayer[np.nonzero(flattenLayer)])
-    #     stdLayer = np.std(flattenLayer[np.nonzero(flattenLayer)])
-    #     imgNormalized[z, :, :] = meanTotal + (img[z,:,:] - meanLayer) * (stdTotal/stdLayer)
     return imgNormalized
 
 
 def image_downsample_shape(img, resizeFactor=0.2):
-    # nC, nZ, nX, nY = img.shape
     nZ, nY, nX, nC = img.shape
-    # imgdTFirst = np.zeros((nZ, nX, nY, nC), dtype=img.dtype)
-    # imgdTFirst[:,:,:,0] = img[1].copy()
-    # imgdTFirst[:,:,:,1] = img[0].copy()
-    # imgFloat = img_as_float32(imgdTFirst)
     imgResized = resize_image(img, rsz=resizeFactor)
-    # zToXYRatio = zToXYRatioReal*resizeFactor
     
     _, nXResized, nYResized, _  = imgResized.shape
     imgResizedShaped = np.zeros((nZ, nC, nXResized, nYResized), dtype=imgResized.dtype)
@@ -121,10 +89,7 @@ def image_downsample_shape(img, resizeFactor=0.2):
         for c in range(nC):
             imgResizedShaped[z, c, :, :] = imgResized[z, :, :, c]
 
-    # print(imgResizedShaped.shape)
     return imgResizedShaped
-    # print(imgResized.shape)
-    # return imgResized
 
 
 def background_subtraction(img, size=10, mode='nearest'):
@@ -132,35 +97,10 @@ def background_subtraction(img, size=10, mode='nearest'):
     """
     img = img[0,...]
     filtered = white_tophat(img, size=size, mode=mode)
-    # imgTophat = np.array(
-    #     [white_tophat(img[z], size=size, mode=mode) for z in range(img.shape[0])]
-    # )
-
-    # imgTophat = np.zeros_like(img)
-    # for z in range(img.shape[0]):
-    #     imgTophat[z] = white_tophat(img[z], size=size, mode=mode)
-    # imgTophat = imgTophat[None, ...]
-    
-    # return imgTophat[None,...]
-    # return imgTophat
     return filtered[None,...]
 
 def mask_closing(mask):
     maskClosed = np.zeros_like(mask)
-
-    # for i in range(1, mask.max()+1):
-    #     maskI = (mask==i)
-    #     maskIClosed = morphology.binary_closing(maskI, selem=selem)
-    #     # maskIClosed = morphology.binary_erosion(maskIClosed, selem=selem)
-    #     # maskIClosed = morphology.binary_dilation(maskIClosed, selem=expand)
-
-    #     z, y, x = np.nonzero(maskIClosed)
-    #     # for c in range(z.size):
-    #     #     if mask[z[c],y[c],x[c]]==0 or mask[z[c],y[c],x[c]]==i:
-    #     #         maskClosed[z[c],y[c],x[c]] = i
-                
-    #     maskClosed[z,y,x] = i
-
     for i in tqdm(range(1, mask.max()+1)):
         maskI = (mask==i)
         for z in range(maskI.shape[0]):
@@ -208,11 +148,6 @@ def image_shift(refImg, movImg):
     """
     return shift coordinates
     """
-    # # refImg = refImg[0,...]
-    # shift, _, _ = phase_cross_correlation(refImg, movImg)
-
-    # # return shift[None,...]
-    # return shift
 
     if refImg.shape != movImg.shape and refImg.size > movImg.size:
         rz, ry, rx = refImg.shape
@@ -240,17 +175,11 @@ def image_shift(refImg, movImg):
         shift, _, _ = phase_cross_correlation(refImg, movImg)
 
     return shift.astype(np.float32)
-    # print(shift_zx, shift_zy)
-    # shift = np.array([(shift_zx[0]+shift_zy[0])/2, shift_zy[1], shift_zx[1]]).astype(np.float32)
-    # return shift
 
 
 def image_warp(img, shift=None):
-    # img = img[0,...]
     if shift is None:
         shift = np.array([0,0,0])
-    # else:
-    #     shift = shift[0,...]
 
     z, y, x = img.shape
     newZ, newY, newX = np.mgrid[:z, :y, :x]
@@ -260,7 +189,6 @@ def image_warp(img, shift=None):
     del newZ, newY, newX, newCoordinates
     gc.collect()
 
-    # return imgMoved[None,...]
     return imgMoved
 
 
