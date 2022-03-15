@@ -2,13 +2,16 @@ from tkinter import N
 from cell_detection import *
 from spot_detection import *
 from image_manipulation import *
+import params
 from params import *
+import time
 
 import pandas as pd
 
 from argparse import ArgumentParser
 import os
 from glob import glob
+import logging
 
 import dask
 import dask.array as da
@@ -35,7 +38,28 @@ args = my_parser.parse_args()
 path = args.Path
 filepath = os.path.join(path, "*.tif")
 filenames = sorted(glob(filepath), key=os.path.basename)
+
+# start log and start time
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+fh = logging.FileHandler(f'{path}/get_expression_matrix.log')
+fh.setLevel(logging.DEBUG)
+# create formatter
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# add formatter to ch
+fh.setFormatter(formatter)
+# add ch to logger
+logger.addHandler(fh)
+print(logger.handlers)
+
+
+# print paramters to log file
+parameters = globals().get("params", None)
+if parameters:
+    print("Should log params")
+    [logger.info(f"{key} {value}") for key, value in parameters.__dict__.items() if not (key.startswith('__') or key.startswith('_'))]
 print(filenames)
+
 nR = len(filenames)  # number of rounds
 
 imgReference = image_read(filenames[roundRef])
@@ -50,10 +74,12 @@ print(f"thresholds: {thresholds}")
 
 
 print(f">> STEP 1. Cell detection -")
+logger.info(">> STEP 1. Cell detection -")
 img_cells = img_as_float32(np.stack((imgReference[cellch], imgReference[0]), axis=3))
 cellLabels, zToXYRatioReal, nCells = cell_detection(
     img_cells, zToXYRatioReal=zToXYRatioReal, resizeFactor=0.2
 )
+logger.info(f"{nCells} cells detected")
 
 dapi_reference_cropped = image_crop(imgReference[0], shift_window_size)
 
@@ -61,10 +87,12 @@ spots_assigned_allrounds = []
 shifts_allrounds = []
 dapis_shifted = []
 
+logger.debug(">> STEPS 2 and 3: \n Registration and Spot Detection for each round")
 for filename in filenames[:roundRef]:
 
     print("\n")
     print(filename)
+    logger.debug(f"Analyzing file {filename}")
 
     img = dask.delayed(image_read)(filename)
 
@@ -78,6 +106,7 @@ for filename in filenames[:roundRef]:
         np.array(round_shift) + np.array(color_shift) for color_shift in color_shifts
     ]
     print(shifts)
+    logger.debug(f"shits are {shifts}")
 
     shifts_allrounds.append(np.array(shifts).astype(np.float32))
     dapis_shifted.append(
@@ -115,6 +144,7 @@ for filename in filenames[:roundRef]:
     print(
         f"# of spots detected for this round: {[len(spots) for spots in spots_assigned]}"
     )
+    logger.debug(f"{[len(spots) for spots in spots_assigned]} spots detected in this round")
 
     spots_assigned_allrounds.append(spots_assigned)
 
@@ -122,6 +152,8 @@ dapis_shifted.append(
     image_warp(image_crop(dapi_reference_cropped, 500), shift=color_shifts[0])
 )
 
+print(f">> STEP 4. Save results -")
+logger.debug(">> STEP 4. Save results -")
 zarr.save(
     os.path.join(path, "result/result_images.zarr"),
     imgCells=img_cells,
@@ -133,7 +165,7 @@ zarr.save(
     thresholds=np.array(thresholds),
 )
 
-print(f">> STEP 4. Save results -")
+
 spots_results = []
 for r, spots_assigned in enumerate(spots_assigned_allrounds):
     for c, spots in enumerate(spots_assigned):
@@ -156,6 +188,7 @@ resultDf = pd.DataFrame(
     }
 )
 resultDf.to_excel(excel_writer=os.path.join(path, "result/result.xlsx"))
+logger.info(f"Cell Detection Results:\n {resultDf.to_string()}")
 
 target_index = np.zeros((nR, nC), dtype=np.int)
 index = 0
@@ -175,3 +208,4 @@ for spot_index in range(spots_results.shape[0]):
 
 resultDf2 = pd.DataFrame(data=spots_per_cell)
 resultDf2.to_excel(excel_writer=os.path.join(path, "result/result_spots_per_cell.xlsx"))
+logger.info(f"Results Matrix:\n {resultDf2.to_string()}")
