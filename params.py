@@ -1,9 +1,9 @@
-nC = 5      # number of channels / colors
+nC = 5  # number of channels / colors
 # nR = 5
 # nR = 13     # number of rounds (except the last dT labeling)
 # nR = 10
-roundRef = -1    #  round containing the cell reference; use -1 for the last round
-cellch = 3      # channel containing cell reference 
+roundRef = -1  #  round containing the cell reference; use -1 for the last round
+cellch = 3  # channel containing cell reference
 # cellch = 1
 
 # nC = 3          # smHCR (211112)
@@ -12,7 +12,7 @@ cellch = 3      # channel containing cell reference
 # cellch = 2
 img_size = (2048, 2048)
 
-sigma = [0.4, 0.7, 1.]      # estimate size of spots to detect
+sigma = [0.4, 0.7, 1.0]  # estimate size of spots to detect
 
 # shift_window_size = 200     # ? TODO
 shift_window_size = 1000
@@ -25,13 +25,13 @@ shift_window_size = 1000
 # absolute_thresholds = [150., 200., 150., 200.]          # 211229 - thalamus
 # absolute_thresholds = [200., 300., 150., 300.]          # 211229 - cerebellum
 # absolute_thresholds = [200., 600.]                          # 211112 - smhcr
-absolute_thresholds = [200., 600., 250., 600.]          # 211024
+absolute_thresholds = [200.0, 600.0, 250.0, 600.0]  # 211024
 
-virus_list = ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8']
+virus_list = ["PHP.eB", "CAP-B10", "PHP.N", "PHP.Astro", "PHP.V1", "PHP.B8"]
 n_variants = len(virus_list)  # number of variants in pool
 
 # leiden_resolution = .5  # 210430, 210828
-leiden_resolution = .5
+leiden_resolution = 0.5
 
 # color_shifts = [[8, 0, 0],          # color aberration shifts for each channel to 647 aquired by imaging focalcheck #1, 500nm
 #                 [-1, 0, 1],         # from 210507_focalcheck
@@ -39,11 +39,13 @@ leiden_resolution = .5
 #                 [0, 0, 0],
 #                 [1, -3, 2]]
 
-color_shifts = [[ 8, 0, 0],      # from 211031_focalcheck
-                [-1, 1, 0],
-                [-1, 1, 0],
-                [ 0, 0, 0],
-                [ 1, -5, 2]]
+color_shifts = [
+    [8, 0, 0],  # from 211031_focalcheck
+    [-1, 1, 0],
+    [-1, 1, 0],
+    [0, 0, 0],
+    [1, -5, 2],
+]
 
 # color_shifts = [[ 8, 0, 0],      # smHCR (211112)
 #                 [-1, 1, 0],
@@ -72,33 +74,35 @@ color_shifts = [[ 8, 0, 0],      # from 211031_focalcheck
 # stitching parameters - 220116
 # stitching_shape = (4, 6)                        # montage shape (w, h)
 stitching_shape = (6, 4)  # (h, w)
-stitching_overlap = 10                          # % overlap between tiles
+stitching_overlap = 10  # % overlap between tiles
 # stitching_size = (7530, 11134)
 stitching_size = (11134, 7530)
-stitching_coords = [[-7.615, -22.138, 0.261],
-                    [-6.120, -17.701, 0.125],
-                    [-4.598, -13.090, 0.071],
-                    [-3.059, -8.732, 0.107],
-                    [-1.517, -4.413, 0.049],
-                    [0., 0., 0.],
-                    [-4.876, 1.226, -0.081],
-                    [-6.135, -3.616, -0.117],
-                    [-7.392, -8.382, -0.220],
-                    [-9.012, -12.471, 0.129],
-                    [-10.267, -17.106, 0.000],
-                    [-12.130, -22.385, -0.612],
-                    [-16.937, -21.038, -0.701],
-                    [-15.563, -16.348, -0.694],
-                    [-14.174, -11.718, -0.563],
-                    [-12.777, -7.307, -0.491],
-                    [-11.356, -2.713, -0.533],
-                    [-9.933, 1.870, -0.534],
-                    [-14.822, 3.189, -0.544],
-                    [-16.165, -1.452, -0.559],
-                    [-17.562, -6.150, -0.524],
-                    [-19.007, -10.466, -0.621],
-                    [-20.426, -15.106, -0.790],
-                    [-21.791, -19.762, -0.847]]
+stitching_coords = [
+    [-7.615, -22.138, 0.261],
+    [-6.120, -17.701, 0.125],
+    [-4.598, -13.090, 0.071],
+    [-3.059, -8.732, 0.107],
+    [-1.517, -4.413, 0.049],
+    [0.0, 0.0, 0.0],
+    [-4.876, 1.226, -0.081],
+    [-6.135, -3.616, -0.117],
+    [-7.392, -8.382, -0.220],
+    [-9.012, -12.471, 0.129],
+    [-10.267, -17.106, 0.000],
+    [-12.130, -22.385, -0.612],
+    [-16.937, -21.038, -0.701],
+    [-15.563, -16.348, -0.694],
+    [-14.174, -11.718, -0.563],
+    [-12.777, -7.307, -0.491],
+    [-11.356, -2.713, -0.533],
+    [-9.933, 1.870, -0.534],
+    [-14.822, 3.189, -0.544],
+    [-16.165, -1.452, -0.559],
+    [-17.562, -6.150, -0.524],
+    [-19.007, -10.466, -0.621],
+    [-20.426, -15.106, -0.790],
+    [-21.791, -19.762, -0.847],
+]
 
 
 # gene_list = ['PHP.N', 'PHP.eB', 'PHP.B8', None,             # 210430
@@ -129,10 +133,10 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 #              'opalin', 'ccnb1', 'enpp6', 'dcn',
 #              'pecam1', 'kcnj8', 'mrc1', 'hexb']
 
-# gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N', 
+# gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N',
 #                      'PHP.Astro', 'PHP.V1', 'PHP.B8',
 #                      'slc30a3',
-#                      'cux2', 'rorb', 'hsd11b1', 'chrna6', 'rprm', 'crym', 'osr1', 'trh', 
+#                      'cux2', 'rorb', 'hsd11b1', 'chrna6', 'rprm', 'crym', 'osr1', 'trh',
 #                      'gad1',
 #                      'lamp5', 'sncg', 'krt73',
 #                      'pvalb', 'tpbg', 'sst', 'chodl', 'crh', 'reln',
@@ -186,13 +190,13 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 #             #  'gfap', 'mbp', None, None]
 #             'gfap', None, None, None]
 
-# gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N', 
+# gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N',
 #                      'PHP.Astro', 'PHP.V1', 'PHP.B8',
 #                      'slc30a3', 'slc17a7', 'pcp4',
-#                      'cux2', 'rorb', 'hsd11b1', 'chrna6', 'rprm', 'crym', 'osr1', 'trh', 
+#                      'cux2', 'rorb', 'hsd11b1', 'chrna6', 'rprm', 'crym', 'osr1', 'trh',
 #                      'gad1', 'gad2',
 #                      'lamp5', 'sncg', 'krt73',
-#                      'pvalb', 'tpbg', 'sst', 'chodl', 'crh', 'reln', 
+#                      'pvalb', 'tpbg', 'sst', 'chodl', 'crh', 'reln',
 #                      'vip', 'gpc3',
 #                      'gja1', 'serpinf1', 'gfap', 'aqp4',
 #                      'mbp', 'ccnb1', 'opalin', 'enpp6',
@@ -207,7 +211,7 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 # gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N',                  # striatum
 #                      'PHP.Astro', 'PHP.V1', 'PHP.B8',
 #                      'tac1', 'gad2', 'trh', 'tpbg', 'sst', 'reln', 'calb1', 'crym', 'gad1', 'chat', 'pcp4']
-                    
+
 # gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N',                  # midbrain
 #                      'PHP.Astro', 'PHP.V1', 'PHP.B8',
 #                      'calb2', 'tac1', 'pvalb', 'gad2', 'th', 'slc6a4', 'trh', 'sst', 'chrna6', 'calb1', 'gpc3', 'chat', 'sncg', 'rprm', 'gad1', 'pcp4']
@@ -218,7 +222,7 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 
 # gene_list = ['PHP.N', 'PHP.eB', 'slc30a3', 'PHP.B8',                  # 211229
 #              'PHP.Astro', 'CAP-B10', 'gad2', 'PHP.V1',
-#              'cux2', 'slc17a7', 'ctgf', 'sulf2', 
+#              'cux2', 'slc17a7', 'ctgf', 'sulf2',
 #              'foxp1', 'foxp2', 'calb2', 'calb1',
 #              'sst', 'pvalb', 'vip', 'drd1',
 #              'tac1', 'lamp5', 'drd2', 'gad1',
@@ -232,12 +236,12 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 #              'gpc3', 'ccnb1', None, None]
 
 # gene_list_ordered = ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8',
-#                      'slc30a3', 'gad2', 
-#                      'cux2', 'slc17a7', 'ctgf', 'sulf2', 
+#                      'slc30a3', 'gad2',
+#                      'cux2', 'slc17a7', 'ctgf', 'sulf2',
 #                      'foxp1', 'foxp2', 'calb2', 'calb1',
 #                      'sst', 'pvalb', 'vip', 'drd1',
 #                      'tac1', 'lamp5', 'drd2', 'gad1',
-#                      'ly6a', 'pcp4', 'crym', 'rorb', 
+#                      'ly6a', 'pcp4', 'crym', 'rorb',
 #                      'rprm', 'reln', 'hsd11b1', 'tpbg',
 #                      'necab1', 'tnnt1', 'crh', 'prkcd',
 #                      'gdf10', 'lgi2', 'ppp1r17', 'gabra6',
@@ -249,7 +253,7 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 #     'PHP.N', 'PHP.eB', 'slc30a3', 'PHP.B8',
 #     'PHP.Astro', 'CAP-B10', 'gad2', 'PHP.V1',
 #     'cux2', 'slc17a7', 'ctgf', 'sulf2',
-#     'foxp1', 'foxp2', 'calb2', 'calb1', 
+#     'foxp1', 'foxp2', 'calb2', 'calb1',
 #     'sst', 'pvalb', 'vip', 'gad1',
 #     'tac1', 'lamp5', 'crym', 'rorb',
 #     'rprm', 'reln', 'hsd11b1', 'tpbg',
@@ -268,10 +272,10 @@ stitching_coords = [[-7.615, -22.138, 0.261],
 #     'ctgf', 'trh', 'chrna6','ppp1r17',
 #     'gad1', 'gad2',
 #     'pvalb', 'reln',
-#     'sst', 'tac1', 'calb2', 'crh', 
+#     'sst', 'tac1', 'calb2', 'crh',
 #     'vip',
 #     'sncg','krt73',
-#     'lgi2', 
+#     'lgi2',
 # ]
 # gene_list_ordered = [gene for gene in gene_list if gene is not None]
 

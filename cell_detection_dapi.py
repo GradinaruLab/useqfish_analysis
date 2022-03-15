@@ -1,27 +1,29 @@
 from image_manipulation import *
 from cellpose.models import Cellpose
+
 # import numpy as np
 from skimage import img_as_float32
 
 
 def run_cellpose(
-    img, 
-    channels, 
-    gpu=True, 
-    model_type='cyto', 
-    diameter=30, 
-    device=None, 
+    img,
+    channels,
+    gpu=True,
+    model_type="cyto",
+    diameter=30,
+    device=None,
     anisotropy=None,
     stitch_threshold=0.25,
     cellprob_threshold=0.0,
     flow_threshold=0.4,
     min_size=15,
-    do_3D=False):
+    do_3D=False,
+):
     # model = models.Cellpose(gpu=gpu, model_type=model, device=device, torch=False)
     model = Cellpose(gpu=gpu, model_type=model_type)
     mask, flow, style, diam = model.eval(
-        img, 
-        channels=channels, 
+        img,
+        channels=channels,
         do_3D=do_3D,
         diameter=diameter,
         anisotropy=anisotropy,
@@ -34,11 +36,12 @@ def run_cellpose(
     )
     return mask, flow, style, diam
 
+
 def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     """
     main function for cell detection using cellpose
     """
-    
+
     zToXYRatio = zToXYRatioReal * resizeFactor
     img_cells = img_as_float32(img)
 
@@ -50,22 +53,22 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
 
     mask, _, _, _ = run_cellpose(
         imgFiltered,
-        [0,0],
-        model_type='cyto2',
+        [0, 0],
+        model_type="cyto2",
         gpu=True,
         # device=mx.gpu(1),
         anisotropy=zToXYRatio,
         diameter=medianDiameters,
         cellprob_threshold=-5,
         flow_threshold=0.6,
-        min_size=1000, #min_size is not actually working well. how does it work with 3d, stitch_threshold
+        min_size=1000,  # min_size is not actually working well. how does it work with 3d, stitch_threshold
         do_3D=True,
         # stitch_threshold=0.1 # not necessarily critical
-    )    
-    
+    )
+
     nCells = np.unique(mask).size - 1
-    print(f'>>>> {nCells} of cells detected')
-    print(f'>>>> median of diameters: {medianDiameters}')
+    print(f">>>> {nCells} of cells detected")
+    print(f">>>> median of diameters: {medianDiameters}")
 
     # outlineRGB = image_with_outlines(np.squeeze(imgResizedShaped[:,0,:,:]), mask)
 
@@ -89,7 +92,7 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     # nNuclei = np.unique(mask_nuclei).size - 1
     # print(f'>>>> {nNuclei} of nuclei detected')
     # print(f'>>>> median of diameters: {estimated_diameter_nuclei}')
-    
+
     # outlineRGBNuclei = image_with_outlines(np.squeeze(imgResizedShaped[:,1,:,:]), maskNuclei)
 
     # print(f'zToXYRatio: {zToXYRatio}')
@@ -103,17 +106,25 @@ def cell_detection(img, zToXYRatioReal=1, resizeFactor=0.2):
     ## convex_hull
     # maskConvex = mask_convex_hull(mask)
     maskClosed = mask_closing(mask.copy())
-    maskUpsampled = mask_upsample(maskClosed, (img.shape[0], img.shape[1], img.shape[2]))
+    maskUpsampled = mask_upsample(
+        maskClosed, (img.shape[0], img.shape[1], img.shape[2])
+    )
     # maskUpsampledOutlined = utils.masks_to_outlines(maskUpsampled)
 
     # mask_nuclei_closed = mask_closing(mask_nuclei.copy())
     # mask_nuclei_upsampled = mask_upsample(mask_nuclei_closed, (img.shape[0], img.shape[1], img.shape[2]))
 
-    del imgResizedShaped, imgNormalized, imgFiltered, mask, maskClosed, 
+    del (
+        imgResizedShaped,
+        imgNormalized,
+        imgFiltered,
+        mask,
+        maskClosed,
+    )
     gc.collect()
 
     # return maskUpsampled, maskUpsampledOutlined, zToXYRatioReal, nCells
-    return maskUpsampled, zToXYRatioReal, nCells 
+    return maskUpsampled, zToXYRatioReal, nCells
 
 
 # def confine_cell_detection():

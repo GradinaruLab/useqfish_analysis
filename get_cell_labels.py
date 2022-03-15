@@ -9,6 +9,7 @@ from image_manipulation import *
 from params import *
 
 import pandas as pd
+
 # from pylab import *
 
 from argparse import ArgumentParser
@@ -21,31 +22,35 @@ from dask.diagnostics import ProgressBar
 from dask_image import ndfilters
 import zarr
 
-from warnings import filterwarnings; filterwarnings("ignore")
+from warnings import filterwarnings
 
-my_parser = ArgumentParser(description='Run analysis on a group of images')
+filterwarnings("ignore")
 
-my_parser.add_argument('Path',
-                       metavar='path',
-                       type=str,
-                       help='the path to the diretory containing the images')
+my_parser = ArgumentParser(description="Run analysis on a group of images")
+
+my_parser.add_argument(
+    "Path",
+    metavar="path",
+    type=str,
+    help="the path to the diretory containing the images",
+)
 
 
 # Parse arguments
 args = my_parser.parse_args()
 
 path = args.Path
-filepath = os.path.join(path, '*.tif')    
+filepath = os.path.join(path, "*.tif")
 filenames = sorted(glob(filepath), key=os.path.basename)
 print(filenames)
-nR = len(filenames) # number of rounds
+nR = len(filenames)  # number of rounds
 
 ## read reference image and metadata
 imgReference = image_read(filenames[roundRef])
 # dapi_reference = imgReference[0]
 
 imgMetadata = read_ome_metadata(filenames[roundRef])
-zToXYRatioReal = imgMetadata['zRealSize']/imgMetadata['xRealSize']
+zToXYRatioReal = imgMetadata["zRealSize"] / imgMetadata["xRealSize"]
 nC, size_z, size_y, size_x = imgReference.shape
 
 # imax = [0 for i in range(nC)]
@@ -55,9 +60,9 @@ nC, size_z, size_y, size_x = imgReference.shape
 #     img_mip = image_mip(img, axis=1)
 #     img_thresholds = [image_threshold(img_mip[c]) for c in range(nC)]
 #     print(img_thresholds)
-    # img_thresholds = [np.amax(threshold) for threshold in img_thresholds]
-    # imax = [np.maximum(imax_ch, threshold) for imax_ch, threshold in zip(imax, img_thresholds)]
-    # imin = [np.minimum(imin_ch, np.amin(img_mip[c])) for c, imin_ch in enumerate(imin)]
+# img_thresholds = [np.amax(threshold) for threshold in img_thresholds]
+# imax = [np.maximum(imax_ch, threshold) for imax_ch, threshold in zip(imax, img_thresholds)]
+# imin = [np.minimum(imin_ch, np.amin(img_mip[c])) for c, imin_ch in enumerate(imin)]
 
 # print(f'max values for each channel: {imax}')
 # print(f'min values for each channel: {imin}')
@@ -70,16 +75,14 @@ thresholds = absolute_thresholds
 #         thresholds.append(250.)
 #     else:
 #         thresholds.append(np.percentile(image_mip(imgReference[ch], axis=0), 99.99)+100.)
-print(f'thresholds: {thresholds}')
+print(f"thresholds: {thresholds}")
 
 
-print(f'>> STEP 1. Cell detection -')
+print(f">> STEP 1. Cell detection -")
 img_cells = img_as_float32(np.stack((imgReference[cellch], imgReference[0]), axis=3))
 # img_cells[:,:,:,1] = image_warp(img_cells[:,:,:,1], color_shifts[0])
 cellLabels, zToXYRatioReal, nCells = cell_detection(
-    img_cells, 
-    zToXYRatioReal=zToXYRatioReal,
-    resizeFactor=0.2
+    img_cells, zToXYRatioReal=zToXYRatioReal, resizeFactor=0.2
 )
 
 # dapi_reference_cropped = image_crop(imgReference[0], shift_window_size)
@@ -89,7 +92,7 @@ cellLabels, zToXYRatioReal, nCells = cell_detection(
 # dapis_shifted = []
 
 # for filename in filenames[:roundRef]:
-    
+
 #     print('\n')
 #     print(filename)
 
@@ -97,14 +100,14 @@ cellLabels, zToXYRatioReal, nCells = cell_detection(
 #     # img_scaled = [dask.delayed(image_rescale_intensity)(img[c], (imin_ch, imax_ch)) for c, (imin_ch, imax_ch) in enumerate(zip(imin, imax))]
 #     # img = [dask.delayed(img_as_float32)(img[c]) for c in range(nC)]
 
-    
+
 #     print(f'>> STEP 2. registration - ')
 
 #     dapi = img_as_float32(img[0].compute())
 #     dapi_cropped = image_crop(dapi, shift_window_size)
 #     round_shift = image_shift(dapi_reference_cropped, dapi_cropped)
 #     # round_shift = image_shift(imgReference[0], dapi)
-    
+
 #     shifts = [np.array(round_shift) + np.array(color_shift) for color_shift in color_shifts]
 #     print(shifts)
 
@@ -114,16 +117,16 @@ cellLabels, zToXYRatioReal, nCells = cell_detection(
 #     # dapi = img[0].compute()
 #     # round_shift = image_shift(imgReference[0], dapi)
 #     # print(f'round_shift: {round_shift}')
-    
+
 #     # shifts = [np.array(round_shift) + np.array(color_shift).astype(round_shift.dtype) for color_shift in color_shifts]
 #     # print(shifts)
-    
+
 #     # shifts_allrounds.append(np.array(shifts))
 #     # dapis_shifted.append(image_warp(image_crop(dapi, 500), shift=np.array(shifts[0])))
 
 #     print(f'>> STEP 3. Spot detection -')
 #     # set up dask for running in parallel
-    
+
 #     # daimg = [da.from_delayed(ch, dtype=np.float32, shape=dapi.shape) for ch in img[1:]]
 #     daimg = [da.from_delayed(img[c].astype(np.float32), dtype=np.float32, shape=dapi.shape) for c in range(1, nC)]
 #     # daimg = [ndfilters.median_filter(ch) for ch in daimg]
@@ -139,7 +142,7 @@ cellLabels, zToXYRatioReal, nCells = cell_detection(
 #     # # print(f'chunk size: {daimg[0].chunksize}')
 
 #     # print(np.amax(orig), orig.dtype, np.amax(med), med.dtype, np.amax(wth), wth.dtype)
-    
+
 #     img_delayed = [dask.delayed(ch) for ch in daimg]
 
 #     spots = [
@@ -162,7 +165,7 @@ cellLabels, zToXYRatioReal, nCells = cell_detection(
 # # dapis_shifted.append(image_warp(image_crop(imgReference[0], 500), shift=color_shifts[0]))
 
 zarr.save(
-    os.path.join(path, 'result/result_images.zarr'),
+    os.path.join(path, "result/result_images.zarr"),
     # imgCells=img_cells,
     cellLabels=cellLabels,
     # zToXYRatioReal=zToXYRatioReal,

@@ -1,4 +1,3 @@
-
 import scanpy as sc
 
 import numpy as np
@@ -11,7 +10,9 @@ from params import *
 
 from converting_anndata import *
 
-from warnings import filterwarnings; filterwarnings("ignore")
+from warnings import filterwarnings
+
+filterwarnings("ignore")
 
 sc.settings.verbosity = 3
 
@@ -21,19 +22,21 @@ import zarr
 
 my_parser = ArgumentParser(description="Run stitching for tiled image")
 
-my_parser.add_argument('Path',
-                       metavar='path',
-                       type=str,
-                       help='the path to the directory containing spot detection result (xlsx files)')
+my_parser.add_argument(
+    "Path",
+    metavar="path",
+    type=str,
+    help="the path to the directory containing spot detection result (xlsx files)",
+)
 
 args = my_parser.parse_args()
 path = args.Path
 
 # if len(os.path.join(path, 'cell_labels_stitched.zarr'))==0:
-    
-filepath = os.path.join(path, 'expression_matrix.h5ad')
 
-if len(filepath)==0:
+filepath = os.path.join(path, "expression_matrix.h5ad")
+
+if len(filepath) == 0:
     xlsx2h5ad(path)
 
 adata = sc.read_h5ad(filepath)
@@ -112,16 +115,11 @@ adata = sc.read_h5ad(filepath)
 # adata.write_h5ad(os.path.join(path, 'expression_matrix_stitched.h5ad'))
 # zarr.save(os.path.join(path, 'cell_labels_stitched.zarr'), cell_labels_stitched)
 
-cell_labels_stitched = zarr.load(os.path.join(path, 'cell_labels_stitched.zarr'))
+cell_labels_stitched = zarr.load(os.path.join(path, "cell_labels_stitched.zarr"))
 # cell_labels_stitched = np.random.random_integers(0, 10, stitching_size)
 # cell_labels_stitched = zarr.load(os.path.join(path, 'cell_labels/position00.zarr'))
 # cell_labels_stitched = np.flip(cell_labels_stitched, axis=1)
 viewer = napari.Viewer()
-viewer.add_labels(
-    cell_labels_stitched,
-    name='cell_labels',
-    multiscale=False
-)
+viewer.add_labels(cell_labels_stitched, name="cell_labels", multiscale=False)
 
 napari.run()
-

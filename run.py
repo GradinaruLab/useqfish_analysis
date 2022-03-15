@@ -4,14 +4,18 @@ from argparse import ArgumentParser
 import os
 from glob import glob
 
-from warnings import filterwarnings; filterwarnings("ignore")
+from warnings import filterwarnings
 
-my_parser = ArgumentParser(description='Run analysis on a group of images')
+filterwarnings("ignore")
 
-my_parser.add_argument('Path',
-                       metavar='path',
-                       type=str,
-                       help='the path to the diretory containing the images')
+my_parser = ArgumentParser(description="Run analysis on a group of images")
+
+my_parser.add_argument(
+    "Path",
+    metavar="path",
+    type=str,
+    help="the path to the diretory containing the images",
+)
 
 
 # Parse arguments
@@ -25,4 +29,4 @@ folderpaths = [os.path.join(path, folder) for folder in folders]
 
 for folderpath in folderpaths:
     if os.path.isdir(folderpath):
-        os.system('python -m get_expression_matrix ' + folderpath)
+        os.system("python -m get_expression_matrix " + folderpath)

@@ -4,8 +4,8 @@
 n_neighbors = 50
 vmax = 3
 vmin = -1
-cmap_z = 'coolwarm'
-cmap_raw = 'viridis'
+cmap_z = "coolwarm"
+cmap_raw = "viridis"
 ifdoublet = False
 poor_cluster_percentile_threshold = 20
 poor_cluster_zstd_threshold = 10
@@ -28,9 +28,12 @@ from converting_anndata import *
 
 from sklearn.cluster import AgglomerativeClustering
 
-from warnings import filterwarnings; filterwarnings("ignore")
+from warnings import filterwarnings
+
+filterwarnings("ignore")
 
 sc.settings.verbosity = 3
+
 
 def anndata_copy_attributes(src_anndata, dtn_anndata):
     dtn_anndata.obs = src_anndata.obs
@@ -41,8 +44,8 @@ def anndata_copy_attributes(src_anndata, dtn_anndata):
 
 ## collect excel files from all positions
 # path = './expression_matrices/210828/220117_analyzed'
-path = './expression_matrices/211229'
-filepath = os.path.join(path, '*.h5ad')    
+path = "./expression_matrices/211229"
+filepath = os.path.join(path, "*.h5ad")
 filenames = sorted(glob(filepath), key=os.path.basename)
 print(filenames)
 
@@ -56,14 +59,14 @@ if len(adatas) == 1:
     adata = adatas[0]
 else:
     # for adata in adatas: print(adata.var_names)
-    adata = sc.concat(adatas, join='inner')
+    adata = sc.concat(adatas, join="inner")
     adata.obs_names_make_unique()
 
 print(adata)
 print(adata.var_names)
 # print(adata.obs['position'])
 
-print(f'>>> total cell number: {adata.n_obs}')
+print(f">>> total cell number: {adata.n_obs}")
 
 # %%
 
@@ -72,28 +75,34 @@ adata_endo = adata[:, ~adata.var_names.isin(virus_list)]
 
 # data quality check
 sc.pp.calculate_qc_metrics(adata_endo, percent_top=None, inplace=True, log1p=False)
-sc.pl.violin(adata_endo, ['n_genes_by_counts', 'total_counts'], jitter=0.4, multi_panel=True)
-sc.pl.scatter(adata_endo, x='total_counts', y='n_genes_by_counts')
+sc.pl.violin(
+    adata_endo, ["n_genes_by_counts", "total_counts"], jitter=0.4, multi_panel=True
+)
+sc.pl.scatter(adata_endo, x="total_counts", y="n_genes_by_counts")
 
 # %%
 print(adata_endo)
 # %%
-poor_expression_threshold = np.percentile(adata_endo.obs['total_counts'], 50)
+poor_expression_threshold = np.percentile(adata_endo.obs["total_counts"], 50)
 if (poor_expression_threshold == 0) | (np.isnan(poor_expression_threshold)):
     poor_expression_threshold = 1
-print(f'poor_expression_threshold: {poor_expression_threshold}')
+print(f"poor_expression_threshold: {poor_expression_threshold}")
 
-sns.histplot(adata_endo.obs['total_counts'])
+sns.histplot(adata_endo.obs["total_counts"])
 
 # %%
-cell_subset, _ = sc.pp.filter_cells(adata_endo, min_counts=poor_expression_threshold, inplace=False)
+cell_subset, _ = sc.pp.filter_cells(
+    adata_endo, min_counts=poor_expression_threshold, inplace=False
+)
 cell_subset2, _ = sc.pp.filter_cells(adata_endo, max_counts=1500, inplace=False)
 cell_subset = cell_subset & cell_subset2
-gene_subset, number_per_gene = sc.pp.filter_genes(adata_endo, min_counts=1, inplace=False)
+gene_subset, number_per_gene = sc.pp.filter_genes(
+    adata_endo, min_counts=1, inplace=False
+)
 
 adata_endo = adata_endo[cell_subset, gene_subset]
 adata_virus = adata_virus[cell_subset, :]
-print(f'>>> total cells passed the filter: {adata_endo.n_obs}')
+print(f">>> total cells passed the filter: {adata_endo.n_obs}")
 
 # %%
 print(adata_endo)
@@ -108,11 +117,11 @@ adata_endo_scale = sc.pp.scale(adata_endo_log, copy=True)
 fig, axs = plt.subplots(2, 2, figsize=(9, 9))
 idx = 5
 # nonzeros = adata_endo.raw.X[:,idx] > 0
-nonzeros = adata_endo.raw.X[:,idx]>-1
-sns.histplot(adata_endo.raw.X[nonzeros,idx], ax=axs[0,0])
-sns.histplot(adata_endo_norm.X[nonzeros,idx], ax=axs[0,1])
-sns.histplot(adata_endo_log.X[nonzeros,idx], ax=axs[1,0])
-sns.histplot(adata_endo_scale.X[nonzeros,idx], ax=axs[1,1])
+nonzeros = adata_endo.raw.X[:, idx] > -1
+sns.histplot(adata_endo.raw.X[nonzeros, idx], ax=axs[0, 0])
+sns.histplot(adata_endo_norm.X[nonzeros, idx], ax=axs[0, 1])
+sns.histplot(adata_endo_log.X[nonzeros, idx], ax=axs[1, 0])
+sns.histplot(adata_endo_scale.X[nonzeros, idx], ax=axs[1, 1])
 
 plt.show()
 
@@ -123,19 +132,23 @@ sc.pp.scale(adata_endo)
 
 # %%
 for idx in range(adata_endo.n_vars):
-    sns.scatterplot(x=adata_endo.obs['total_counts'], y=adata_endo.raw.X[:,idx], y_jitter=0.1)
+    sns.scatterplot(
+        x=adata_endo.obs["total_counts"], y=adata_endo.raw.X[:, idx], y_jitter=0.1
+    )
 
 # %%
 for idx in range(adata_endo.n_vars):
-    sns.scatterplot(x=adata_endo.obs['total_counts'], y=adata_endo.X[:, idx], y_jitter=0.1)
+    sns.scatterplot(
+        x=adata_endo.obs["total_counts"], y=adata_endo.X[:, idx], y_jitter=0.1
+    )
 
 # %%
 sc.pp.pca(adata_endo)
-sc.pp.neighbors(adata_endo, use_rep='X_pca', n_neighbors=n_neighbors)
+sc.pp.neighbors(adata_endo, use_rep="X_pca", n_neighbors=n_neighbors)
 sc.tl.umap(adata_endo)
-sc.tl.tsne(adata_endo, use_rep='X_pca')
+sc.tl.tsne(adata_endo, use_rep="X_pca")
 sc.tl.leiden(adata_endo, resolution=leiden_resolution)
-sc.tl.dendrogram(adata_endo, groupby='leiden', use_rep='X_pca')
+sc.tl.dendrogram(adata_endo, groupby="leiden", use_rep="X_pca")
 
 
 # %%
@@ -150,7 +163,7 @@ sc.tl.dendrogram(adata_endo, groupby='leiden', use_rep='X_pca')
 #     stdevs[cluster] = np.std(mean_z)
 # threshold = np.percentile(stdevs, poor_cluster_zstd_threshold)
 # # threshold = .2
-# # 
+# #
 # new_labels = {str(i):str(i) for i in range(n_clusters.astype(np.uint))}
 # for cluster, stdev in enumerate(stdevs):
 #     if stdev < threshold:
@@ -171,50 +184,50 @@ print(adata_virus)
 # %%
 
 sc.pl.umap(
-    adata_virus, 
-    color=['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.B8', 'PHP.V1', 'leiden'], 
-    s=50, 
-    frameon=True, 
-    ncols=3, 
-    vmax='p99'
+    adata_virus,
+    color=["PHP.eB", "CAP-B10", "PHP.N", "PHP.Astro", "PHP.B8", "PHP.V1", "leiden"],
+    s=50,
+    frameon=True,
+    ncols=3,
+    vmax="p99",
 )
 
 
 sc.pl.tsne(
-    adata_virus, 
-    color=['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.B8', 'PHP.V1', 'leiden'], 
-    s=50, 
-    frameon=True, 
-    ncols=3, 
-    vmax='p99'
+    adata_virus,
+    color=["PHP.eB", "CAP-B10", "PHP.N", "PHP.Astro", "PHP.B8", "PHP.V1", "leiden"],
+    s=50,
+    frameon=True,
+    ncols=3,
+    vmax="p99",
 )
 
 
-clustering_method='leiden'
+clustering_method = "leiden"
 
 # %%
-with rc_context({'figure.figsize': (15, 15)}):
+with rc_context({"figure.figsize": (15, 15)}):
     sc.pl.heatmap(
-        adata_endo, 
-        adata_endo.var_names, 
-        groupby=clustering_method, 
-        cmap=cmap_z, 
+        adata_endo,
+        adata_endo.var_names,
+        groupby=clustering_method,
+        cmap=cmap_z,
         dendrogram=True,
         swap_axes=True,
         use_raw=False,
         vmax=vmax,
-        vmin=vmin
+        vmin=vmin,
     )
     sc.pl.matrixplot(
-        adata_endo, 
-        adata_endo.var_names, 
-        groupby=clustering_method, 
-        cmap=cmap_z, 
+        adata_endo,
+        adata_endo.var_names,
+        groupby=clustering_method,
+        cmap=cmap_z,
         dendrogram=True,
         swap_axes=True,
         use_raw=False,
         vmax=vmax,
-        vmin=vmin
+        vmin=vmin,
     )
 
 # %%
@@ -230,28 +243,30 @@ transcription_rate = np.zeros((n_variants, n_clusters), dtype=np.uint)
 for i, virus in enumerate(virus_list):
     for j, cluster in enumerate(np.unique(cluster_labels)):
         cluster = int(cluster)
-        cell_inds = np.argwhere(cluster_labels==cluster).ravel()
-        transduction_rate[i,j] = np.count_nonzero(adata_virus[cell_inds, virus].X)*100. / cell_inds.size
+        cell_inds = np.argwhere(cluster_labels == cluster).ravel()
+        transduction_rate[i, j] = (
+            np.count_nonzero(adata_virus[cell_inds, virus].X) * 100.0 / cell_inds.size
+        )
         nonzeros = (adata_virus[cell_inds, virus].X != 0).ravel()
         tcpr = np.mean(adata_virus[cell_inds, virus].X[nonzeros].ravel())
         if ~np.isnan(tcpr):
-            transcription_rate[i,j] = tcpr
+            transcription_rate[i, j] = tcpr
 
 
-fig, axs = plt.subplots(1, 2, figsize=(18,9))
+fig, axs = plt.subplots(1, 2, figsize=(18, 9))
 sns.heatmap(
-    data=transduction_rate, 
-    cmap='Blues', 
+    data=transduction_rate,
+    cmap="Blues",
     xticklabels=np.unique(cluster_labels),
-    yticklabels=virus_list, 
-    ax=axs[0]
+    yticklabels=virus_list,
+    ax=axs[0],
 )
 sns.heatmap(
-    data=transcription_rate, 
-    cmap='Reds', 
+    data=transcription_rate,
+    cmap="Reds",
     xticklabels=np.unique(cluster_labels),
-    yticklabels=virus_list, 
-    ax=axs[1]
+    yticklabels=virus_list,
+    ax=axs[1],
 )
 
 # #######################################
@@ -269,7 +284,7 @@ sns.heatmap(
 #         vmax=vmax,
 #         vmin=vmin
 #     )
-    
+
 #     sc.pl.matrixplot(
 #         adata_virus,
 #         adata_virus.var_names,
@@ -281,11 +296,11 @@ sns.heatmap(
 #         dendrogram=True,
 #     )
 #     sc.pl.matrixplot(
-#         adata_virus, 
+#         adata_virus,
 #         adata_virus.var_names,
-#         'leiden', 
-#         cmap='Reds', 
-#         standard_scale='var', 
+#         'leiden',
+#         cmap='Reds',
+#         standard_scale='var',
 #         colorbar_title='row log scaled\nexpression',
 #         swap_axes=True,
 #         dendrogram=True,
@@ -300,10 +315,10 @@ sns.heatmap(
 
 # with rc_context({'figure.figsize': (15, 15)}):
 #     sc.pl.heatmap(
-#         adata_endo, 
-#         adata_endo.var_names, 
-#         groupby='leiden_new', 
-#         cmap=cmap_z, 
+#         adata_endo,
+#         adata_endo.var_names,
+#         groupby='leiden_new',
+#         cmap=cmap_z,
 #         dendrogram=True,
 #         swap_axes=True,
 #         use_raw=False,
@@ -341,7 +356,7 @@ sns.heatmap(
 #         dendrogram=True,
 #         swap_axes=True
 #     )
-    
+
 #     sc.pl.dotplot(
 #         adata_virus,
 #         adata_virus.var_names,
@@ -351,24 +366,24 @@ sns.heatmap(
 #         colorbar_title='column scaled\nexpression',
 #         swap_axes=True,
 #         dendrogram=True,
-        
+
 #     )
 #     sc.pl.dotplot(
-#         adata_virus, 
+#         adata_virus,
 #         adata_virus.var_names,
-#         'leiden_new', 
-#         cmap='Reds', 
-#         standard_scale='var', 
+#         'leiden_new',
+#         cmap='Reds',
+#         standard_scale='var',
 #         colorbar_title='row scaled\nexpression',
 #         swap_axes=True,
 #         dendrogram=True,
 #     )
 #     sc.pl.matrixplot(
-#         adata_virus, 
+#         adata_virus,
 #         adata_virus.var_names,
-#         'leiden_new', 
-#         cmap='Reds', 
-#         standard_scale='var', 
+#         'leiden_new',
+#         cmap='Reds',
+#         standard_scale='var',
 #         colorbar_title='row scaled\nexpression',
 #         swap_axes=True,
 #         dendrogram=True,
@@ -377,96 +392,104 @@ sns.heatmap(
 
 # %%
 # position vs leiden cluster (position-file vs cluster heatmap)
-positions = np.asarray(adata_endo.obs['position'])
+positions = np.asarray(adata_endo.obs["position"])
 positions_int = []
 for position in positions:
     positions_int.append(int(position[-2:]))
 positions = positions_int
-labels = np.asarray(adata_endo.obs['leiden']).astype(np.int)
-n_pos = np.amax(positions)+1
-n_labels = np.amax(labels)+1
+labels = np.asarray(adata_endo.obs["leiden"]).astype(np.int)
+n_pos = np.amax(positions) + 1
+n_labels = np.amax(labels) + 1
 
 position_by_cluster = np.zeros((n_pos, n_labels), dtype=np.int)
 
 for pos, label in zip(positions, labels):
-    position_by_cluster[pos, label] = position_by_cluster[pos,label] + 1
+    position_by_cluster[pos, label] = position_by_cluster[pos, label] + 1
 
 active_position = np.sum(position_by_cluster, axis=1) > 0
-position_by_cluster = position_by_cluster[active_position,:]
+position_by_cluster = position_by_cluster[active_position, :]
 active_position = np.argwhere(active_position).flatten()
-print(active_position) 
-s = sns.heatmap(data=position_by_cluster, cmap='viridis', yticklabels=active_position)
-s.set(xlabel='leiden', ylabel='position')
+print(active_position)
+s = sns.heatmap(data=position_by_cluster, cmap="viridis", yticklabels=active_position)
+s.set(xlabel="leiden", ylabel="position")
 
 # %%
 total_position_count_per_cluster = np.sum(position_by_cluster, axis=0)
 
-position_by_cluster_norm = position_by_cluster.T/total_position_count_per_cluster[:,None]
+position_by_cluster_norm = (
+    position_by_cluster.T / total_position_count_per_cluster[:, None]
+)
 position_by_cluster_norm = position_by_cluster_norm.T
 
 s = sns.heatmap(
-    data=position_by_cluster_norm,
-    cmap='viridis',
-    yticklabels=active_position
+    data=position_by_cluster_norm, cmap="viridis", yticklabels=active_position
 )
-s.set(xlabel='leiden', ylabel='position')
+s.set(xlabel="leiden", ylabel="position")
 
 # %%
 s = sns.clustermap(
     data=position_by_cluster_norm,
-    cmap='viridis',
+    cmap="viridis",
     yticklabels=active_position,
     row_cluster=False,
-    method='ward',
+    method="ward",
     # vmax=0.5
 )
-s.fig.savefig('./figures/position_cluster.svg', dpi=600)
+s.fig.savefig("./figures/position_cluster.svg", dpi=600)
 
 # %%
 leiden_idx_reordered = s.dendrogram_col.reordered_ind
 leiden_idx_reordered = [str(idx) for idx in leiden_idx_reordered]
-with rc_context({'figure.figsize': (15, 15)}):    
+with rc_context({"figure.figsize": (15, 15)}):
     img = sc.pl.MatrixPlot(
         adata_endo,
         # adata_endo.var_names,
         gene_list_ordered[6:],
-        'leiden',
+        "leiden",
         categories_order=leiden_idx_reordered,
         use_raw=False,
-        cmap='bwr'
+        cmap="bwr",
     ).swap_axes()
     img.show()
-    img.savefig('./figures/region_endo.svg', format='svg')
+    img.savefig("./figures/region_endo.svg", format="svg")
 
     img = sc.pl.MatrixPlot(
         adata_endo,
         gene_list_ordered[6:],
-        'leiden',
+        "leiden",
         categories_order=leiden_idx_reordered,
-        cmap='viridis'
+        cmap="viridis",
     ).swap_axes()
     img.show()
-    img.savefig('./figures/region_endo_raw.svg', format='svg')
+    img.savefig("./figures/region_endo_raw.svg", format="svg")
 
-    img = sc.pl.MatrixPlot(
-        adata_virus,
-        ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8'],
-        'leiden',
-        categories_order=leiden_idx_reordered,
-        standard_scale='obs',
-    ).style(cmap='Blues').swap_axes()
+    img = (
+        sc.pl.MatrixPlot(
+            adata_virus,
+            ["PHP.eB", "CAP-B10", "PHP.N", "PHP.Astro", "PHP.V1", "PHP.B8"],
+            "leiden",
+            categories_order=leiden_idx_reordered,
+            standard_scale="obs",
+        )
+        .style(cmap="Blues")
+        .swap_axes()
+    )
     img.show()
-    img.savefig('./figures/region_virus_obs.svg', format='svg')
+    img.savefig("./figures/region_virus_obs.svg", format="svg")
 
-    img = sc.pl.MatrixPlot(
-        adata_virus,
-        ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8'],
-        'leiden',
-        categories_order=leiden_idx_reordered,
-        standard_scale='var',
-    ).style(cmap='Reds').swap_axes()
+    img = (
+        sc.pl.MatrixPlot(
+            adata_virus,
+            ["PHP.eB", "CAP-B10", "PHP.N", "PHP.Astro", "PHP.V1", "PHP.B8"],
+            "leiden",
+            categories_order=leiden_idx_reordered,
+            standard_scale="var",
+        )
+        .style(cmap="Reds")
+        .swap_axes()
+    )
     img.show()
-    img.savefig('./figures/region_virus_var.svg', format='svg')
+    img.savefig("./figures/region_virus_var.svg", format="svg")
 # %%
 # sc.tl.rank_genes_groups(adata_endo, groupby='leiden', method='wilcoxon')
 # sc.pl.rank_genes_groups_matrixplot(adata_endo, n_genes=1, use_raw=False, vmin=-2, vmax=2, cmap='bwr')
