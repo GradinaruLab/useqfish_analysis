@@ -1,9 +1,8 @@
 import numpy as np
 
-from skimage.filters import gaussian, median, threshold_isodata
-from skimage.morphology import convex_hull_image, square
-from skimage.segmentation import expand_labels
-from skimage.transform import resize, warp, EuclideanTransform, AffineTransform
+from skimage.filters import gaussian, median
+from skimage.morphology import square
+from skimage.transform import warp, EuclideanTransform, AffineTransform
 from skimage.registration import phase_cross_correlation
 from skimage.util import img_as_float32
 from skimage.exposure import rescale_intensity
@@ -33,7 +32,6 @@ def image_crop(img, shift_window_size):
 def image_read(filename):
     """
     read ome-tiff file as numpy array, converted to [0.0 1.0] float32 type
-    if dapi channel is not the first, bring the dapi channel to the first
     """
     return imread(filename)
 
@@ -114,44 +112,6 @@ def background_subtraction(img, size=10, mode="nearest"):
     img = img[0, ...]
     filtered = white_tophat(img, size=size, mode=mode)
     return filtered[None, ...]
-
-
-def mask_closing(mask):
-    maskClosed = np.zeros_like(mask)
-    for i in tqdm(range(1, mask.max() + 1)):
-        maskI = mask == i
-        for z in range(maskI.shape[0]):
-            maskIHull = convex_hull_image(maskI[z])
-            y, x = np.nonzero(maskIHull)
-            maskClosed[z, y, x] = i
-        for y in range(maskI.shape[1]):
-            maskIHull = convex_hull_image(maskI[:, y, :])
-            z, x = np.nonzero(maskIHull)
-            maskClosed[z, y, x] = i
-        for x in range(maskI.shape[2]):
-            maskIHull = convex_hull_image(maskI[:, :, x])
-            z, y = np.nonzero(maskIHull)
-            maskClosed[z, y, x] = i
-
-    return maskClosed
-
-
-def mask_expand(mask, expandDist=1):
-    maskExpanded = np.zeros_like(mask)
-    for z in tqdm(range(mask.shape[0])):
-        maskExpanded[z] = expand_labels(mask[z], distance=expandDist)
-    return maskExpanded.astype(np.uint16)
-
-
-def mask_upsample(mask, finalShape=None):
-    if finalShape is None:
-        raise ValueError("please provide the final shape of the mask")
-    elif mask.ndim != len(finalShape):
-        raise ValueError("dimension of final shape is not matched with input mask")
-    else:
-        maskUpsampled = resize(mask, finalShape, order=0, preserve_range=True)
-
-        return maskUpsampled.astype(np.uint16)
 
 
 def image_with_outlines(img, mask):

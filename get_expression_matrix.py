@@ -39,25 +39,27 @@ path = args.Path
 filepath = os.path.join(path, "*.tif")
 filenames = sorted(glob(filepath), key=os.path.basename)
 
-# start log and start time
+# start log
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-fh = logging.FileHandler(f'{path}/get_expression_matrix.log')
+fh = logging.FileHandler(f"{path}/get_expression_matrix.log")
 fh.setLevel(logging.DEBUG)
 # create formatter
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 # add formatter to ch
 fh.setFormatter(formatter)
 # add ch to logger
 logger.addHandler(fh)
-print(logger.handlers)
 
 
 # print paramters to log file
 parameters = globals().get("params", None)
 if parameters:
-    print("Should log params")
-    [logger.info(f"{key} {value}") for key, value in parameters.__dict__.items() if not (key.startswith('__') or key.startswith('_'))]
+    [
+        logger.info(f"{key} {value}")
+        for key, value in parameters.__dict__.items()
+        if not (key.startswith("__") or key.startswith("_"))
+    ]
 print(filenames)
 
 nR = len(filenames)  # number of rounds
@@ -144,7 +146,9 @@ for filename in filenames[:roundRef]:
     print(
         f"# of spots detected for this round: {[len(spots) for spots in spots_assigned]}"
     )
-    logger.debug(f"{[len(spots) for spots in spots_assigned]} spots detected in this round")
+    logger.debug(
+        f"{[len(spots) for spots in spots_assigned]} spots detected in this round"
+    )
 
     spots_assigned_allrounds.append(spots_assigned)
 
