@@ -20,23 +20,29 @@ from tqdm import tqdm
 from oxdls import OMEXML
 
 
-def image_crop(img, shift_window_size):
+def image_crop(img, window_size):
+    """
+    Crops image along xy plane, starting along the middle of the plane and shifting left and down.
+    """
     _, size_y, size_x = img.shape
     return img[
         :,
-        int(size_y / 2 - shift_window_size) : int(size_y / 2),
-        int(size_x / 2 - shift_window_size) : int(size_x / 2),
+        int(size_y / 2 - window_size) : int(size_y / 2),
+        int(size_x / 2 - window_size) : int(size_x / 2),
     ]
 
 
 def image_read(filename):
     """
-    read ome-tiff file as numpy array, converted to [0.0 1.0] float32 type
+    Read ome-tiff file as numpy array.
     """
     return imread(filename)
 
 
 def image_gaussian_filter(img, sigma=1):
+    """
+    Applies gaussian filter for each xy plane in the z stack and for each channel.
+    """
     imgFiltered = np.zeros_like(img)
     nZ, nC, _, _ = img.shape
 
@@ -48,21 +54,32 @@ def image_gaussian_filter(img, sigma=1):
 
 
 def image_mip(img, axis=0):
+    """
+    Returns the Maximum Intensity Projection along a given axis.
+    """
     return img.max(axis)
 
 
 def image_rescale_intensity(img, out_range="dtype"):
+    """
+    Return image after stretching or shrinking its intensity levels.
+    """
     return rescale_intensity(img, out_range=out_range).astype(np.float32)
 
 
 def image_threshold(img, percentile=99):
+    """
+    Returns the mean intensity of pixels whose intensity is above a certain percentile.
+    """
     percentile_intensity = np.percentile(img, percentile)
     img_above_percentile_intensity = img[img > percentile_intensity]
     return np.mean(img_above_percentile_intensity)
 
 
 def median_filter(img):
-    """ """
+    """
+    Returns the local median of the image. 
+    """
     img = img[0, ...]
     filtered = median(img, square(3))
 
@@ -115,6 +132,9 @@ def background_subtraction(img, size=10, mode="nearest"):
 
 
 def image_with_outlines(img, mask):
+    """
+    Given a mask, returns an image of the mask with oulines.
+    """
     outlines = masks_to_outlines(mask)
     outZ, outY, outX = np.nonzero(outlines)
     imgOutlined = np.zeros((img.shape[0], img.shape[1], img.shape[2], 3))
@@ -152,6 +172,9 @@ def image_shift(refImg, movImg):
 
 
 def image_warp(img, shift=None):
+    """
+    Warp an image according to a given coordinate transformation.
+    """
     if shift is None:
         shift = np.array([0, 0, 0])
 
