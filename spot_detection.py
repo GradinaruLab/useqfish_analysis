@@ -1,6 +1,10 @@
 import numpy as np
 from skimage.feature import blob_log
 import faulthandler
+import dask
+import dask.array as da
+from dask.diagnostics import ProgressBar
+from params import nC, sigma
 
 faulthandler.enable()
 from functools import reduce
@@ -8,6 +12,38 @@ import operator
 from scipy.spatial.distance import cdist
 import gc
 import math
+
+from image_manipulation import background_subtraction
+
+
+def spot_detection(img, thresholds, cellLabels, shape, shifts=None):
+    # set up dask for running in parallel
+    daimg = [
+        da.from_delayed(img[c].astype(np.float32), dtype=np.float32, shape=shape)
+        for c in range(1, nC)
+    ]
+    daimg = [ch.rechunk((1, -1, -1)) for ch in daimg]
+    daimg = [da.map_blocks(background_subtraction, ch, size=20) for ch in daimg]
+    daimg = [ch.rechunk((-1, -1, -1)) for ch in daimg]
+    img_delayed = [dask.delayed(ch) for ch in daimg]
+    spots = [
+        dask.delayed(blob_detection)(
+            ch,
+            shift=shift,
+            minSigma=sigma[0],
+            maxSigma=sigma[-1],
+            numSigma=len(sigma),
+            threshold=th,  # default threshold=0.005
+        )
+        for ch, shift, th in zip(img_delayed, shifts[1:], thresholds)
+    ]
+    spots_assigned = [dask.delayed(spot_assignment)(spot, cellLabels) for spot in spots]
+
+    with ProgressBar():
+        # Compute all set up stop detection and assignment
+        spots_assigned = list(dask.compute(*spots_assigned))
+
+    return spots, spots_assigned
 
 
 def blob_detection(
@@ -35,11 +71,8 @@ def blob_detection(
 
         spotCoordinates.append(list(spots))
 
-    spotCoordinates = reduce(
-        operator.iconcat, spotCoordinates, []
-    )  # make a flatten list
+    spotCoordinates = reduce(operator.iconcat, spotCoordinates, [])
     spotCoordinates = np.array(spotCoordinates)
-    # print(f'spotCoordinates.type: {spotCoordinates.dtype}')
     if spotCoordinates.shape[0] > 0:
         spotNewCoordinates = spot_stitch_3d(spotCoordinates, 1)
         spotCoordsMoved = spot_warp(spotNewCoordinates, shift=shift)
@@ -48,31 +81,22 @@ def blob_detection(
         )
     else:
         spotCoordsNoBoundary = spotCoordinates
-    # print(spotNewCoordinates.shape, spotCoordsMoved.shape)
-    # labelSpots = make_spots_label(img.shape, spotCoordsMoved, maxSigma)
 
-    # return imgSpots, spotCoordinates
-
-    # del spots, spotCoordinates, spotNewCoordinates, spotCoordsMoved
     del spots, spotCoordinates
     gc.collect()
 
-    # return labelSpots, spotCoordsMoved
     return spotCoordsNoBoundary
 
 
 def spot_stitch_3d(spotCoordinates, radius):
-    # nZ = spotCoordinates[:,0].max()
     if radius < 1:
         radius = 1
 
     zrange = list(np.unique(spotCoordinates[:, 0]))
 
     spotLabels = np.zeros((spotCoordinates.shape[0],), dtype=np.uint16)
-    # for z in range(nZ):
     for ind, z in enumerate(zrange):
         spotIdx = np.where(spotCoordinates[:, 0] == z)[0]
-        # print(f'spotIdx.shape: {spotIdx.shape}')
         if spotIdx.size > 0:
             if ind == 0:
                 spotLabels[spotIdx] = np.arange(1, spotIdx.size + 1)
@@ -84,12 +108,9 @@ def spot_stitch_3d(spotCoordinates, radius):
                     distances = cdist(
                         spotCoordinates[preIdx, 1:3], spotCoordinates[spotIdx, 1:3]
                     )
-                    # print(f'distances.shape: {distances.shape}')
                     minDist = np.amin(distances, axis=0)
-                    # print(f'minDist.shape: {minDist.shape}')
                     minIdx = np.argmin(distances, axis=0)
                     newLabel = np.zeros((spotIdx.size,))
-                    # print(minDist, minIdx)
                     for i, (md, mi) in enumerate(zip(list(minDist), list(minIdx))):
                         if md <= radius:
                             newLabel[i] = preLabel[mi]

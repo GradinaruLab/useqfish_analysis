@@ -78,7 +78,7 @@ def image_threshold(img, percentile=99):
 
 def median_filter(img):
     """
-    Returns the local median of the image. 
+    Returns the local median of the image.
     """
     img = img[0, ...]
     filtered = median(img, square(3))

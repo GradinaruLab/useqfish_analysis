@@ -4,7 +4,6 @@ from spot_detection import *
 from image_manipulation import *
 import params
 from params import *
-import time
 
 import pandas as pd
 
@@ -13,9 +12,7 @@ import os
 from glob import glob
 import logging
 
-import dask
-import dask.array as da
-from dask.diagnostics import ProgressBar
+
 import zarr
 
 from warnings import filterwarnings
@@ -71,10 +68,6 @@ zToXYRatioReal = imgMetadata["zRealSize"] / imgMetadata["xRealSize"]
 nC, size_z, size_y, size_x = imgReference.shape
 
 
-thresholds = absolute_thresholds
-print(f"thresholds: {thresholds}")
-
-
 print(f">> STEP 1. Cell detection -")
 logger.info(">> STEP 1. Cell detection -")
 img_cells = img_as_float32(np.stack((imgReference[cellch], imgReference[0]), axis=3))
@@ -117,31 +110,10 @@ for filename in filenames[:roundRef]:
 
     print(f">> STEP 3. Spot detection -")
 
-    # set up dask for running in parallel
-    daimg = [
-        da.from_delayed(img[c].astype(np.float32), dtype=np.float32, shape=dapi.shape)
-        for c in range(1, nC)
-    ]
-    daimg = [ch.rechunk((1, -1, -1)) for ch in daimg]
-    daimg = [da.map_blocks(background_subtraction, ch, size=20) for ch in daimg]
-    daimg = [ch.rechunk((-1, -1, -1)) for ch in daimg]
-    img_delayed = [dask.delayed(ch) for ch in daimg]
-    spots = [
-        dask.delayed(blob_detection)(
-            ch,
-            shift=shift,
-            minSigma=sigma[0],
-            maxSigma=sigma[-1],
-            numSigma=len(sigma),
-            threshold=th,  # default threshold=0.005
-        )
-        for ch, shift, th in zip(img_delayed, shifts[1:], thresholds)
-    ]
-    spots_assigned = [dask.delayed(spot_assignment)(spot, cellLabels) for spot in spots]
-
-    with ProgressBar():
-        # Compute all set up stop detection and assignment
-        spots_assigned = list(dask.compute(*spots_assigned))
+    spots, spots_assigned = spot_detection(
+        img, absolute_thresholds, cellLabels, shifts=shifts, shape=dapi.shape
+    )
+    spots_assigned_allrounds.append(spots_assigned)
 
     print(
         f"# of spots detected for this round: {[len(spots) for spots in spots_assigned]}"
@@ -150,11 +122,12 @@ for filename in filenames[:roundRef]:
         f"{[len(spots) for spots in spots_assigned]} spots detected in this round"
     )
 
-    spots_assigned_allrounds.append(spots_assigned)
+    
 
 dapis_shifted.append(
     image_warp(image_crop(dapi_reference_cropped, 500), shift=color_shifts[0])
 )
+
 
 print(f">> STEP 4. Save results -")
 logger.debug(">> STEP 4. Save results -")
@@ -166,7 +139,7 @@ zarr.save(
     shifts_allrounds=np.array(shifts_allrounds),
     dapis_shifted=np.array(dapis_shifted),
     nR=nR,
-    thresholds=np.array(thresholds),
+    thresholds=np.array(absolute_thresholds),
 )
 
 
@@ -179,7 +152,7 @@ for r, spots_assigned in enumerate(spots_assigned_allrounds):
 
 spots_results = np.array(spots_results)
 print(f">>>> Total {spots_results.shape[0]} spots detected")
-print(f">>>> intensity threshold: {thresholds}")
+print(f">>>> intensity threshold: {absolute_thresholds}")
 
 resultDf = pd.DataFrame(
     {
