@@ -48,7 +48,7 @@ imgReference = image_read(filenames[roundRef])
 # dapi_reference = imgReference[0]
 
 imgMetadata = read_ome_metadata(filenames[roundRef])
-zToXYRatioReal = imgMetadata["zRealSize"] / imgMetadata["xRealSize"]
+zToXYRatioReal = imgMetadata["PhysicalSizeZ"] / imgMetadata["xRealSize"]
 nC, size_z, size_y, size_x = imgReference.shape
 
 

@@ -14,6 +14,7 @@ from cellpose.utils import masks_to_outlines
 from scipy.ndimage import white_tophat
 
 from tifffile import imread, TiffFile
+from pyometiff import OMETIFFReader
 
 import gc
 from tqdm import tqdm
@@ -194,22 +195,11 @@ def read_ome_metadata(filePath):
     Args: file path of ome-tiff
 
     Returns: dictionary of parsed metadata
+
+    Notes:
+    A template metadata dict is available at OMETIFFReader._get_metadata_template()
     """
-    with TiffFile(filePath) as tif:
-        imgMetadata = OMEXML(tif.ome_metadata)
+    reader = OMETIFFReader(fpath=filePath)
+    _, metadata, _ = reader.read()
 
-    dictMetadata = {
-        "nChannels": imgMetadata.image().Pixels.channel_count,
-        "xPixels": imgMetadata.image().Pixels.SizeX,
-        "yPixels": imgMetadata.image().Pixels.SizeY,
-        "zPixels": imgMetadata.image().Pixels.SizeZ,
-        "xRealSize": imgMetadata.image().Pixels.PhysicalSizeX,
-        "yRealSize": imgMetadata.image().Pixels.PhysicalSizeY,
-        "zRealSize": imgMetadata.image().Pixels.PhysicalSizeZ,
-        "channelNames": [
-            imgMetadata.image().Pixels.Channel(ch).Name.split("_")[0]
-            for ch in range(imgMetadata.image().Pixels.channel_count)
-        ],
-    }
-
-    return dictMetadata
+    return metadata

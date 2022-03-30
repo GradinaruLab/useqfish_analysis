@@ -17,6 +17,9 @@ from image_manipulation import background_subtraction
 
 
 def spot_detection(img, thresholds, cellLabels, shape, shifts=None):
+    """
+    Find spots in image and assign to given cell labels. 
+    """
     # set up dask for running in parallel
     daimg = [
         da.from_delayed(img[c].astype(np.float32), dtype=np.float32, shape=shape)
@@ -27,7 +30,7 @@ def spot_detection(img, thresholds, cellLabels, shape, shifts=None):
     daimg = [ch.rechunk((-1, -1, -1)) for ch in daimg]
     img_delayed = [dask.delayed(ch) for ch in daimg]
     spots = [
-        dask.delayed(blob_detection)(
+        dask.delayed(find_spots)(
             ch,
             shift=shift,
             minSigma=sigma[0],
@@ -46,7 +49,7 @@ def spot_detection(img, thresholds, cellLabels, shape, shifts=None):
     return spots, spots_assigned
 
 
-def blob_detection(
+def find_spots(
     img, shift=None, minSigma=1, maxSigma=10, numSigma=10, threshold=0.1, overlap=0
 ):
     """ """

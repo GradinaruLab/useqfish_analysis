@@ -64,7 +64,7 @@ nR = len(filenames)  # number of rounds
 imgReference = image_read(filenames[roundRef])
 
 imgMetadata = read_ome_metadata(filenames[roundRef])
-zToXYRatioReal = imgMetadata["zRealSize"] / imgMetadata["xRealSize"]
+zToXYRatioReal = imgMetadata["PhysicalSizeZ"] / imgMetadata["PhysicalSizeX"]
 nC, size_z, size_y, size_x = imgReference.shape
 
 

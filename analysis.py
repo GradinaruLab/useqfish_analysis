@@ -55,7 +55,7 @@ dapi_reference = img_as_float32(imgReference[0])
 size_z, size_y, size_x = dapi_reference.shape
 
 imgMetadata = read_ome_metadata(filenames[roundRef])
-zToXYRatioReal = imgMetadata["zRealSize"] / imgMetadata["xRealSize"]
+zToXYRatioReal = imgMetadata["PhysicalSizeZ"] / imgMetadata["PhysicalSizeX"]
 
 
 print(f">> STEP 1. Cell detection -")
