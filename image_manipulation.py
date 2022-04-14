@@ -1,4 +1,5 @@
 import numpy as np
+import zarr
 
 from skimage.filters import gaussian, median
 from skimage.morphology import square
@@ -199,7 +200,14 @@ def read_ome_metadata(filePath):
     Notes:
     A template metadata dict is available at OMETIFFReader._get_metadata_template()
     """
+    
     reader = OMETIFFReader(fpath=filePath)
     _, metadata, _ = reader.read()
-
+    
     return metadata
+
+def save_to_zarr(path, **kwargs):
+    """
+    Saves variables in kwargs to path using zarr format.
+    """
+    zarr.save(path, **kwargs)

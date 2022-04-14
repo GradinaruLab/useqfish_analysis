@@ -7,7 +7,7 @@ import os
 # import random
 
 from params import *
-from cell_detection import *
+from image_manipulation import image_mip, image_read, image_warp
 
 import pandas as pd
 
@@ -17,19 +17,20 @@ from matplotlib.cm import get_cmap
 from matplotlib.colors import rgb2hex
 
 from scipy.ndimage import shift
+import numpy as np
 
 
 from warnings import filterwarnings
 
 filterwarnings("ignore")
 
-my_parser = ArgumentParser(description="Run analysis on a group of images")
+my_parser = ArgumentParser(description="Visualize results from Useqfish Analysis")
 
 my_parser.add_argument(
     "Path",
     metavar="path",
     type=str,
-    help="the path to the diretory containing the images",
+    help="the path to the diretory containing the results777789",
 )
 
 my_parser.add_argument("--mip", action="store_true")
@@ -45,7 +46,6 @@ cells = load(os.path.join(path, "result_images.zarr"))
 zToXYRatioReal = cells["zToXYRatioReal"]
 imgCells = cells["imgCells"]
 cellLabels = cells["cellLabels"]
-# cellOutlines = cells['cellOutlines']
 shifts_allrounds = cells["shifts_allrounds"]
 dapis_shifted = cells["dapis_shifted"]
 nR = cells["nR"]

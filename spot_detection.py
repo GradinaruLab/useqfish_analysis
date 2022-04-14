@@ -161,14 +161,11 @@ def spot_remove_out_of_boundary(imgShape, spotCoords, radius):
         label = coord[-1]
 
         zyxCoord = np.where(
-            # zyxCoord >= radius,
             zyxCoord >= 0,
             zyxCoord,
             np.NaN
-            # radius
         )
         zyxCoord = np.where(
-            # zyxCoord < (np.array([nZ, nY, nX])-radius),
             zyxCoord < np.array([nZ, nY, nX]),
             zyxCoord,
             np.NaN

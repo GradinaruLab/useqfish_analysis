@@ -1,3 +1,4 @@
+# Copyright 2022 California Institute of Technology
 from tkinter import N
 from cell_detection import *
 from spot_detection import *
@@ -11,9 +12,6 @@ from argparse import ArgumentParser
 import os
 from glob import glob
 import logging
-
-
-import zarr
 
 from warnings import filterwarnings
 
@@ -64,7 +62,9 @@ nR = len(filenames)  # number of rounds
 imgReference = image_read(filenames[roundRef])
 
 imgMetadata = read_ome_metadata(filenames[roundRef])
+
 zToXYRatioReal = imgMetadata["PhysicalSizeZ"] / imgMetadata["PhysicalSizeX"]
+
 nC, size_z, size_y, size_x = imgReference.shape
 
 
@@ -131,7 +131,7 @@ dapis_shifted.append(
 
 print(f">> STEP 4. Save results -")
 logger.debug(">> STEP 4. Save results -")
-zarr.save(
+save_to_zarr(
     os.path.join(path, "result/result_images.zarr"),
     imgCells=img_cells,
     cellLabels=cellLabels,
