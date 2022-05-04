@@ -9,6 +9,7 @@ from params import *
 from image_manipulation import *
 
 import numpy as np
+
 # from scipy.ndimage import shift
 import pandas as pd
 
@@ -19,17 +20,21 @@ import napari
 import zarr
 import scanpy as sc
 
-from warnings import filterwarnings; filterwarnings("ignore")
+from warnings import filterwarnings
 
-my_parser = ArgumentParser(description='Run analysis on a group of images')
+filterwarnings("ignore")
 
-my_parser.add_argument('Path',
-                       metavar='path',
-                       type=str,
-                       help='the path to the diretory containing the images')
+my_parser = ArgumentParser(description="Run analysis on a group of images")
 
-my_parser.add_argument('--mip', action='store_true')
-my_parser.add_argument('--cell', action='store_true')
+my_parser.add_argument(
+    "Path",
+    metavar="path",
+    type=str,
+    help="the path to the diretory containing the images",
+)
+
+my_parser.add_argument("--mip", action="store_true")
+my_parser.add_argument("--cell", action="store_true")
 
 # Parse arguments
 args = my_parser.parse_args()
@@ -39,7 +44,7 @@ ismip = args.mip
 iscell = args.cell
 
 nR = 5
-cmap = get_cmap('rainbow', nR*nC)
+cmap = get_cmap("rainbow", nR * nC)
 # colors = [matplotlib.colors.rgb2hex(c) for c in cmap.colors]
 colors = [rgb2hex(cmap(i)) for i in range(cmap.N)]
 resolution = 0.151
@@ -49,11 +54,11 @@ stitching_coords = np.array(stitching_coords) - np.array(stitching_coords[0])
 stitching_coords = list(stitching_coords)
 montage_w, montage_h = stitching_shape
 
-no_overlapped_size = np.array(img_size)-np.array(img_size)*stitching_overlap/100
+no_overlapped_size = np.array(img_size) - np.array(img_size) * stitching_overlap / 100
 
 
 if ismip:
-    filepath = os.path.join(path, 'result/*.xlsx')
+    filepath = os.path.join(path, "result/*.xlsx")
     filenames = sorted(glob(filepath), key=os.path.basename)
     n_files = len(filenames)
 
@@ -61,19 +66,19 @@ if ismip:
 
     img_index = 0
     for w in range(montage_w):
-        if w%2 == 0:
+        if w % 2 == 0:
             for h in range(montage_h):
                 stitching_composition[w, h] = img_index
-                img_index = img_index+1
+                img_index = img_index + 1
         else:
-            for h in range(montage_h-1, -1, -1):
+            for h in range(montage_h - 1, -1, -1):
                 stitching_composition[w, h] = img_index
-                img_index = img_index+1
+                img_index = img_index + 1
 
     # # print(stitching_composition)
     # # print(stitching_composition[2, 3])
     # # print(np.argwhere(stitching_composition==15).ravel())
-    
+
     # file_index = 0
     # spots = []
 
@@ -111,39 +116,39 @@ if ismip:
     #         spots_assigned.append(coords)
     #     spots_assigned_allrounds.append(spots_assigned)
 
-
     if iscell:
-        adata_endo = sc.read_h5ad(os.path.join(path, 'h5ad_clustered/endo.h5ad'))
-        cell_filter = adata_endo.uns['cell_subset']
+        adata_endo = sc.read_h5ad(os.path.join(path, "h5ad_clustered/endo.h5ad"))
+        cell_filter = adata_endo.uns["cell_subset"]
         cell_labels_stitched = np.zeros(stitching_size, dtype=np.uint)
 
         cell_index = 1
         label = 1
-        zarr_folders = sorted([f.path for f in os.scandir(os.path.join(path, 'cell_labels')) if f.is_dir()])
+        zarr_folders = sorted(
+            [
+                f.path
+                for f in os.scandir(os.path.join(path, "cell_labels"))
+                if f.is_dir()
+            ]
+        )
         for file_index, zarr_folder in enumerate(zarr_folders):
             cell_labels = zarr.load(zarr_folder)
             n_cells = cell_labels.max()
-            
-            tile_w, tile_h = np.argwhere(stitching_composition==file_index).ravel()
+
+            tile_w, tile_h = np.argwhere(stitching_composition == file_index).ravel()
 
             global_w = tile_w * no_overlapped_size[0] + stitching_coords[file_index][0]
-            global_h = -(tile_h * no_overlapped_size[1] + stitching_coords[file_index][1])
+            global_h = -(
+                tile_h * no_overlapped_size[1] + stitching_coords[file_index][1]
+            )
 
             for cell in range(n_cells):
                 if cell_filter[cell_index]:
-                    cell_coords = np.argwhere(cell_labels==cell+1)[:,:-1]
-                    
-                    
+                    cell_coords = np.argwhere(cell_labels == cell + 1)[:, :-1]
 
-                    label = label+1
-                cell_index = cell_index+1
-                    
-                    
-                    exit()
+                    label = label + 1
+                cell_index = cell_index + 1
 
-
-
-        
+                exit()
 
     viewer = napari.Viewer()
     cind = 0
@@ -161,13 +166,9 @@ if ismip:
                     # edge_color=color,
                     # symbol='ring',
                     size=20,
-                    name=f'{r+1} round, {c+1} ch',
+                    name=f"{r+1} round, {c+1} ch",
                     # visible=False
                 )
                 cind = cind + 1
-                  
 
     napari.run()
-
-    
-    

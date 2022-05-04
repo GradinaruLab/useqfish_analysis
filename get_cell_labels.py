@@ -52,7 +52,6 @@ zToXYRatioReal = imgMetadata["PhysicalSizeZ"] / imgMetadata["PhysicalSizeX"]
 nC, size_z, size_y, size_x = imgReference.shape
 
 
-
 print(f">> STEP 1. Cell detection -")
 img_cells = img_as_float32(np.stack((imgReference[cellch], imgReference[0]), axis=3))
 cellLabels, zToXYRatioReal, nCells = cell_detection(

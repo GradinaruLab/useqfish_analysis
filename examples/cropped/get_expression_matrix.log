@@ -60,7 +60,7 @@
 2022-03-29 14:43:58,401 - __main__ - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
 2022-03-29 14:43:58,420 - __main__ - INFO - >> STEP 1. Cell detection -
 2022-03-29 14:44:09,690 - __main__ - INFO - 8 cells detected
-2022-03-29 14:44:09,690 - __main__ - DEBUG - >> STEPS 2 and 3: 
+2022-03-29 14:44:09,690 - __main__ - DEBUG - >> STEPS 2 and 3:
  Registration and Spot Detection for each round
 2022-03-29 14:44:09,690 - __main__ - DEBUG - Analyzing file test/cropped/round1_210430_6pool_2021-04-30_04.37.53_F0.tif
 2022-03-29 14:44:09,744 - __main__ - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
@@ -119,7 +119,7 @@
 2022-03-29 14:56:53,559 - __main__ - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
 2022-03-29 14:56:53,591 - __main__ - INFO - >> STEP 1. Cell detection -
 2022-03-29 14:57:04,884 - __main__ - INFO - 8 cells detected
-2022-03-29 14:57:04,884 - __main__ - DEBUG - >> STEPS 2 and 3: 
+2022-03-29 14:57:04,884 - __main__ - DEBUG - >> STEPS 2 and 3:
  Registration and Spot Detection for each round
 2022-03-29 14:57:04,884 - __main__ - DEBUG - Analyzing file test/cropped/round1_210430_6pool_2021-04-30_04.37.53_F0.tif
 2022-03-29 14:57:04,916 - __main__ - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
@@ -151,6 +151,301 @@
 9       4        3       11       22       56        0
 10      4        3       13       23       55        0
 2022-03-29 14:57:13,883 - __main__ - INFO - Results Matrix:
+    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+0   0   0   0   0   0   0   0   0   1   0   0   2   0   0   2   0   0   0   0   0
+1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+3   0   0   0   0   0   0   0   0   0   4   0   0   0   0   0   0   0   0   0   0
+4   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+5   0   0   0   0   0   0   0   0   0   2   0   0   0   0   0   0   0   0   0   0
+6   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+7   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+8   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2022-04-26 12:56:58,534 - __main__ - INFO - nC 5
+2022-04-26 12:56:58,536 - __main__ - INFO - roundRef -1
+2022-04-26 12:56:58,536 - __main__ - INFO - cellch 3
+2022-04-26 12:56:58,536 - __main__ - INFO - img_size (2048, 2048)
+2022-04-26 12:56:58,536 - __main__ - INFO - sigma [0.4, 0.7, 1.0]
+2022-04-26 12:56:58,536 - __main__ - INFO - shift_window_size 1000
+2022-04-26 12:56:58,536 - __main__ - INFO - absolute_thresholds [200.0, 600.0, 250.0, 600.0]
+2022-04-26 12:56:58,536 - __main__ - INFO - virus_list ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8']
+2022-04-26 12:56:58,536 - __main__ - INFO - n_variants 6
+2022-04-26 12:56:58,536 - __main__ - INFO - leiden_resolution 0.5
+2022-04-26 12:56:58,536 - __main__ - INFO - color_shifts [[8, 0, 0], [-1, 1, 0], [-1, 1, 0], [0, 0, 0], [1, -5, 2]]
+2022-04-26 12:56:58,537 - __main__ - INFO - stitching_shape (6, 4)
+2022-04-26 12:56:58,537 - __main__ - INFO - stitching_overlap 10
+2022-04-26 12:56:58,537 - __main__ - INFO - stitching_size (11134, 7530)
+2022-04-26 12:56:58,537 - __main__ - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
+2022-04-26 12:56:58,744 - __main__ - INFO - >> STEP 1. Cell detection -
+2022-04-26 12:57:26,998 - __main__ - INFO - 8 cells detected
+2022-04-26 12:57:26,998 - __main__ - DEBUG - >> STEPS 2 and 3:
+ Registration and Spot Detection for each round
+2022-04-26 12:57:26,998 - __main__ - DEBUG - Analyzing file examples/cropped/round1.tif
+2022-04-26 12:57:27,232 - __main__ - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
+2022-04-26 12:57:28,967 - __main__ - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-26 12:57:28,967 - __main__ - DEBUG - Analyzing file examples/cropped/round2.tif
+2022-04-26 12:57:29,188 - __main__ - DEBUG - shits are [array([10.29999995, -2.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 2.29999995, -2.29999995, -0.40000001]), array([ 3.29999995, -7.29999995,  1.59999999])]
+2022-04-26 12:57:30,813 - __main__ - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-26 12:57:30,813 - __main__ - DEBUG - Analyzing file examples/cropped/round3.tif
+2022-04-26 12:57:30,949 - __main__ - DEBUG - shits are [array([11.79999995, -2.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 3.79999995, -2.5999999 , -1.        ]), array([ 4.79999995, -7.5999999 ,  1.        ])]
+2022-04-26 12:57:32,995 - __main__ - DEBUG - [1, 6, 0, 2] spots detected in this round
+2022-04-26 12:57:32,995 - __main__ - DEBUG - Analyzing file examples/cropped/round4.tif
+2022-04-26 12:57:33,184 - __main__ - DEBUG - shits are [array([11.75      , -2.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 3.75      , -2.20000005, -0.5       ]), array([ 4.75      , -7.20000005,  1.5       ])]
+2022-04-26 12:57:35,001 - __main__ - DEBUG - [0, 0, 2, 0] spots detected in this round
+2022-04-26 12:57:35,002 - __main__ - DEBUG - Analyzing file examples/cropped/round5.tif
+2022-04-26 12:57:35,178 - __main__ - DEBUG - shits are [array([10.45000005, -0.40000001, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 2.45000005, -0.40000001, -0.2       ]), array([ 3.45000005, -5.40000001,  1.8       ])]
+2022-04-26 12:57:36,797 - __main__ - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-26 12:57:36,961 - __main__ - DEBUG - >> STEP 4. Save results -
+2022-04-26 12:57:38,405 - __main__ - INFO - Cell Detection Results:
+     round  channel  z-coord  y-coord  x-coord  cell id
+0       3        1        5      173      101        0
+1       3        2        4      232      279        3
+2       3        2        8      231      278        3
+3       3        2        7      138       46        5
+4       3        2        9      232      280        3
+5       3        2       10      273      312        3
+6       3        2       17      126       37        5
+7       3        4       12      423      337        0
+8       3        4       15      421      342        0
+9       4        3       11       22       56        0
+10      4        3       13       23       55        0
+2022-04-26 12:57:38,420 - __main__ - INFO - Results Matrix:
+    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+0   0   0   0   0   0   0   0   0   1   0   0   2   0   0   2   0   0   0   0   0
+1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+3   0   0   0   0   0   0   0   0   0   4   0   0   0   0   0   0   0   0   0   0
+4   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+5   0   0   0   0   0   0   0   0   0   2   0   0   0   0   0   0   0   0   0   0
+6   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+7   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+8   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2022-04-28 13:39:53,252 - get_expression_matrix - INFO - nC 5
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - roundRef -1
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - cellch 3
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - img_size (2048, 2048)
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - sigma [0.4, 0.7, 1.0]
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - shift_window_size 1000
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - absolute_thresholds [200.0, 600.0, 250.0, 600.0]
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - virus_list ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8']
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - n_variants 6
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - leiden_resolution 0.5
+2022-04-28 13:39:53,260 - get_expression_matrix - INFO - color_shifts [[8, 0, 0], [-1, 1, 0], [-1, 1, 0], [0, 0, 0], [1, -5, 2]]
+2022-04-28 13:39:53,261 - get_expression_matrix - INFO - stitching_shape (6, 4)
+2022-04-28 13:39:53,261 - get_expression_matrix - INFO - stitching_overlap 10
+2022-04-28 13:39:53,261 - get_expression_matrix - INFO - stitching_size (11134, 7530)
+2022-04-28 13:39:53,261 - get_expression_matrix - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
+2022-04-28 13:39:53,427 - get_expression_matrix - INFO - >> STEP 1. Cell detection -
+2022-04-28 13:40:15,695 - get_expression_matrix - INFO - 8 cells detected
+2022-04-28 13:40:15,695 - get_expression_matrix - DEBUG - >> STEPS 2 and 3:
+ Registration and Spot Detection for each round
+2022-04-28 13:40:15,695 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round1.tif
+2022-04-28 13:40:16,074 - get_expression_matrix - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
+2022-04-28 13:40:18,194 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:40:18,194 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round2.tif
+2022-04-28 13:40:18,393 - get_expression_matrix - DEBUG - shits are [array([10.29999995, -2.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 2.29999995, -2.29999995, -0.40000001]), array([ 3.29999995, -7.29999995,  1.59999999])]
+2022-04-28 13:40:20,102 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:40:20,102 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round3.tif
+2022-04-28 13:40:20,224 - get_expression_matrix - DEBUG - shits are [array([11.79999995, -2.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 3.79999995, -2.5999999 , -1.        ]), array([ 4.79999995, -7.5999999 ,  1.        ])]
+2022-04-28 13:40:22,397 - get_expression_matrix - DEBUG - [1, 6, 0, 2] spots detected in this round
+2022-04-28 13:40:22,397 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round4.tif
+2022-04-28 13:40:22,550 - get_expression_matrix - DEBUG - shits are [array([11.75      , -2.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 3.75      , -2.20000005, -0.5       ]), array([ 4.75      , -7.20000005,  1.5       ])]
+2022-04-28 13:40:24,283 - get_expression_matrix - DEBUG - [0, 0, 2, 0] spots detected in this round
+2022-04-28 13:40:24,283 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round5.tif
+2022-04-28 13:40:24,454 - get_expression_matrix - DEBUG - shits are [array([10.45000005, -0.40000001, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 2.45000005, -0.40000001, -0.2       ]), array([ 3.45000005, -5.40000001,  1.8       ])]
+2022-04-28 13:40:26,058 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:40:26,245 - get_expression_matrix - DEBUG - >> STEP 4. Save results -
+2022-04-28 13:40:26,587 - get_expression_matrix - INFO - Cell Detection Results:
+     round  channel  z-coord  y-coord  x-coord  cell id
+0       3        1        5      173      101        0
+1       3        2        4      232      279        3
+2       3        2        8      231      278        3
+3       3        2        7      138       46        5
+4       3        2        9      232      280        3
+5       3        2       10      273      312        3
+6       3        2       17      126       37        5
+7       3        4       12      423      337        0
+8       3        4       15      421      342        0
+9       4        3       11       22       56        0
+10      4        3       13       23       55        0
+2022-04-28 13:40:26,600 - get_expression_matrix - INFO - Results Matrix:
+    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+0   0   0   0   0   0   0   0   0   1   0   0   2   0   0   2   0   0   0   0   0
+1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+3   0   0   0   0   0   0   0   0   0   4   0   0   0   0   0   0   0   0   0   0
+4   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+5   0   0   0   0   0   0   0   0   0   2   0   0   0   0   0   0   0   0   0   0
+6   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+7   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+8   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - nC 5
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - roundRef -1
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - cellch 3
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - img_size (2048, 2048)
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - sigma [0.4, 0.7, 1.0]
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - shift_window_size 1000
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - absolute_thresholds [200.0, 600.0, 250.0, 600.0]
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - virus_list ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8']
+2022-04-28 13:41:43,963 - get_expression_matrix - INFO - n_variants 6
+2022-04-28 13:41:43,964 - get_expression_matrix - INFO - leiden_resolution 0.5
+2022-04-28 13:41:43,964 - get_expression_matrix - INFO - color_shifts [[8, 0, 0], [-1, 1, 0], [-1, 1, 0], [0, 0, 0], [1, -5, 2]]
+2022-04-28 13:41:43,964 - get_expression_matrix - INFO - stitching_shape (6, 4)
+2022-04-28 13:41:43,964 - get_expression_matrix - INFO - stitching_overlap 10
+2022-04-28 13:41:43,964 - get_expression_matrix - INFO - stitching_size (11134, 7530)
+2022-04-28 13:41:43,964 - get_expression_matrix - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
+2022-04-28 13:41:43,995 - get_expression_matrix - INFO - >> STEP 1. Cell detection -
+2022-04-28 13:41:55,426 - get_expression_matrix - INFO - 8 cells detected
+2022-04-28 13:41:55,426 - get_expression_matrix - DEBUG - >> STEPS 2 and 3:
+ Registration and Spot Detection for each round
+2022-04-28 13:41:55,426 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round1.tif
+2022-04-28 13:41:55,464 - get_expression_matrix - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
+2022-04-28 13:41:57,129 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:41:57,130 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round2.tif
+2022-04-28 13:41:57,170 - get_expression_matrix - DEBUG - shits are [array([10.29999995, -2.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 2.29999995, -2.29999995, -0.40000001]), array([ 3.29999995, -7.29999995,  1.59999999])]
+2022-04-28 13:41:58,763 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:41:58,763 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round3.tif
+2022-04-28 13:41:58,801 - get_expression_matrix - DEBUG - shits are [array([11.79999995, -2.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 3.79999995, -2.5999999 , -1.        ]), array([ 4.79999995, -7.5999999 ,  1.        ])]
+2022-04-28 13:42:00,751 - get_expression_matrix - DEBUG - [1, 6, 0, 2] spots detected in this round
+2022-04-28 13:42:00,752 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round4.tif
+2022-04-28 13:42:00,802 - get_expression_matrix - DEBUG - shits are [array([11.75      , -2.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 3.75      , -2.20000005, -0.5       ]), array([ 4.75      , -7.20000005,  1.5       ])]
+2022-04-28 13:42:02,490 - get_expression_matrix - DEBUG - [0, 0, 2, 0] spots detected in this round
+2022-04-28 13:42:02,491 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round5.tif
+2022-04-28 13:42:02,561 - get_expression_matrix - DEBUG - shits are [array([10.45000005, -0.40000001, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 2.45000005, -0.40000001, -0.2       ]), array([ 3.45000005, -5.40000001,  1.8       ])]
+2022-04-28 13:42:04,176 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:42:04,357 - get_expression_matrix - DEBUG - >> STEP 4. Save results -
+2022-04-28 13:42:04,621 - get_expression_matrix - INFO - Cell Detection Results:
+     round  channel  z-coord  y-coord  x-coord  cell id
+0       3        1        5      173      101        0
+1       3        2        4      232      279        3
+2       3        2        8      231      278        3
+3       3        2        7      138       46        5
+4       3        2        9      232      280        3
+5       3        2       10      273      312        3
+6       3        2       17      126       37        5
+7       3        4       12      423      337        0
+8       3        4       15      421      342        0
+9       4        3       11       22       56        0
+10      4        3       13       23       55        0
+2022-04-28 13:42:04,635 - get_expression_matrix - INFO - Results Matrix:
+    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+0   0   0   0   0   0   0   0   0   1   0   0   2   0   0   2   0   0   0   0   0
+1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+3   0   0   0   0   0   0   0   0   0   4   0   0   0   0   0   0   0   0   0   0
+4   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+5   0   0   0   0   0   0   0   0   0   2   0   0   0   0   0   0   0   0   0   0
+6   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+7   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+8   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2022-04-28 13:43:23,202 - get_expression_matrix - INFO - nC 5
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - roundRef -1
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - cellch 3
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - img_size (2048, 2048)
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - sigma [0.4, 0.7, 1.0]
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - shift_window_size 1000
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - absolute_thresholds [200.0, 600.0, 250.0, 600.0]
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - virus_list ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8']
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - n_variants 6
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - leiden_resolution 0.5
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - color_shifts [[8, 0, 0], [-1, 1, 0], [-1, 1, 0], [0, 0, 0], [1, -5, 2]]
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - stitching_shape (6, 4)
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - stitching_overlap 10
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - stitching_size (11134, 7530)
+2022-04-28 13:43:23,203 - get_expression_matrix - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
+2022-04-28 13:43:23,235 - get_expression_matrix - INFO - >> STEP 1. Cell detection -
+2022-04-28 13:43:34,570 - get_expression_matrix - INFO - 8 cells detected
+2022-04-28 13:43:34,570 - get_expression_matrix - DEBUG - >> STEPS 2 and 3:
+ Registration and Spot Detection for each round
+2022-04-28 13:43:34,570 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round1.tif
+2022-04-28 13:43:34,607 - get_expression_matrix - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
+2022-04-28 13:43:36,262 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:43:36,262 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round2.tif
+2022-04-28 13:43:36,300 - get_expression_matrix - DEBUG - shits are [array([10.29999995, -2.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 2.29999995, -2.29999995, -0.40000001]), array([ 3.29999995, -7.29999995,  1.59999999])]
+2022-04-28 13:43:37,874 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:43:37,874 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round3.tif
+2022-04-28 13:43:37,912 - get_expression_matrix - DEBUG - shits are [array([11.79999995, -2.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 3.79999995, -2.5999999 , -1.        ]), array([ 4.79999995, -7.5999999 ,  1.        ])]
+2022-04-28 13:43:39,916 - get_expression_matrix - DEBUG - [1, 6, 0, 2] spots detected in this round
+2022-04-28 13:43:39,916 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round4.tif
+2022-04-28 13:43:39,948 - get_expression_matrix - DEBUG - shits are [array([11.75      , -2.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 3.75      , -2.20000005, -0.5       ]), array([ 4.75      , -7.20000005,  1.5       ])]
+2022-04-28 13:43:41,687 - get_expression_matrix - DEBUG - [0, 0, 2, 0] spots detected in this round
+2022-04-28 13:43:41,688 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round5.tif
+2022-04-28 13:43:41,722 - get_expression_matrix - DEBUG - shits are [array([10.45000005, -0.40000001, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 2.45000005, -0.40000001, -0.2       ]), array([ 3.45000005, -5.40000001,  1.8       ])]
+2022-04-28 13:43:43,322 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:43:43,506 - get_expression_matrix - DEBUG - >> STEP 4. Save results -
+2022-04-28 13:43:43,796 - get_expression_matrix - INFO - Cell Detection Results:
+     round  channel  z-coord  y-coord  x-coord  cell id
+0       3        1        5      173      101        0
+1       3        2        4      232      279        3
+2       3        2        8      231      278        3
+3       3        2        7      138       46        5
+4       3        2        9      232      280        3
+5       3        2       10      273      312        3
+6       3        2       17      126       37        5
+7       3        4       12      423      337        0
+8       3        4       15      421      342        0
+9       4        3       11       22       56        0
+10      4        3       13       23       55        0
+2022-04-28 13:43:43,809 - get_expression_matrix - INFO - Results Matrix:
+    0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+0   0   0   0   0   0   0   0   0   1   0   0   2   0   0   2   0   0   0   0   0
+1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+3   0   0   0   0   0   0   0   0   0   4   0   0   0   0   0   0   0   0   0   0
+4   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+5   0   0   0   0   0   0   0   0   0   2   0   0   0   0   0   0   0   0   0   0
+6   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+7   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+8   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - nC 5
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - roundRef -1
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - cellch 3
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - img_size (2048, 2048)
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - sigma [0.4, 0.7, 1.0]
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - shift_window_size 1000
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - absolute_thresholds [200.0, 600.0, 250.0, 600.0]
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - virus_list ['PHP.eB', 'CAP-B10', 'PHP.N', 'PHP.Astro', 'PHP.V1', 'PHP.B8']
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - n_variants 6
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - leiden_resolution 0.5
+2022-04-28 13:45:25,495 - get_expression_matrix - INFO - color_shifts [[8, 0, 0], [-1, 1, 0], [-1, 1, 0], [0, 0, 0], [1, -5, 2]]
+2022-04-28 13:45:25,496 - get_expression_matrix - INFO - stitching_shape (6, 4)
+2022-04-28 13:45:25,496 - get_expression_matrix - INFO - stitching_overlap 10
+2022-04-28 13:45:25,496 - get_expression_matrix - INFO - stitching_size (11134, 7530)
+2022-04-28 13:45:25,496 - get_expression_matrix - INFO - stitching_coords [[-7.615, -22.138, 0.261], [-6.12, -17.701, 0.125], [-4.598, -13.09, 0.071], [-3.059, -8.732, 0.107], [-1.517, -4.413, 0.049], [0.0, 0.0, 0.0], [-4.876, 1.226, -0.081], [-6.135, -3.616, -0.117], [-7.392, -8.382, -0.22], [-9.012, -12.471, 0.129], [-10.267, -17.106, 0.0], [-12.13, -22.385, -0.612], [-16.937, -21.038, -0.701], [-15.563, -16.348, -0.694], [-14.174, -11.718, -0.563], [-12.777, -7.307, -0.491], [-11.356, -2.713, -0.533], [-9.933, 1.87, -0.534], [-14.822, 3.189, -0.544], [-16.165, -1.452, -0.559], [-17.562, -6.15, -0.524], [-19.007, -10.466, -0.621], [-20.426, -15.106, -0.79], [-21.791, -19.762, -0.847]]
+2022-04-28 13:45:25,527 - get_expression_matrix - INFO - >> STEP 1. Cell detection -
+2022-04-28 13:45:36,906 - get_expression_matrix - INFO - 8 cells detected
+2022-04-28 13:45:36,906 - get_expression_matrix - DEBUG - >> STEPS 2 and 3:
+ Registration and Spot Detection for each round
+2022-04-28 13:45:36,906 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round1.tif
+2022-04-28 13:45:36,941 - get_expression_matrix - DEBUG - shits are [array([ 9.39999998, -1.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 0.39999998, -0.10000002,  0.30000001]), array([ 1.39999998, -1.10000002,  0.30000001]), array([ 2.39999998, -6.10000002,  2.30000001])]
+2022-04-28 13:45:38,639 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:45:38,639 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round2.tif
+2022-04-28 13:45:38,676 - get_expression_matrix - DEBUG - shits are [array([10.29999995, -2.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 1.29999995, -1.29999995, -0.40000001]), array([ 2.29999995, -2.29999995, -0.40000001]), array([ 3.29999995, -7.29999995,  1.59999999])]
+2022-04-28 13:45:40,218 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:45:40,219 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round3.tif
+2022-04-28 13:45:40,252 - get_expression_matrix - DEBUG - shits are [array([11.79999995, -2.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 2.79999995, -1.5999999 , -1.        ]), array([ 3.79999995, -2.5999999 , -1.        ]), array([ 4.79999995, -7.5999999 ,  1.        ])]
+2022-04-28 13:45:42,236 - get_expression_matrix - DEBUG - [1, 6, 0, 2] spots detected in this round
+2022-04-28 13:45:42,236 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round4.tif
+2022-04-28 13:45:42,272 - get_expression_matrix - DEBUG - shits are [array([11.75      , -2.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 2.75      , -1.20000005, -0.5       ]), array([ 3.75      , -2.20000005, -0.5       ]), array([ 4.75      , -7.20000005,  1.5       ])]
+2022-04-28 13:45:44,031 - get_expression_matrix - DEBUG - [0, 0, 2, 0] spots detected in this round
+2022-04-28 13:45:44,031 - get_expression_matrix - DEBUG - Analyzing file examples/cropped/round5.tif
+2022-04-28 13:45:44,070 - get_expression_matrix - DEBUG - shits are [array([10.45000005, -0.40000001, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 1.45000005,  0.59999999, -0.2       ]), array([ 2.45000005, -0.40000001, -0.2       ]), array([ 3.45000005, -5.40000001,  1.8       ])]
+2022-04-28 13:45:45,604 - get_expression_matrix - DEBUG - [0, 0, 0, 0] spots detected in this round
+2022-04-28 13:45:45,784 - get_expression_matrix - DEBUG - >> STEP 4. Save results -
+2022-04-28 13:45:46,037 - get_expression_matrix - INFO - Cell Detection Results:
+     round  channel  z-coord  y-coord  x-coord  cell id
+0       3        1        5      173      101        0
+1       3        2        4      232      279        3
+2       3        2        8      231      278        3
+3       3        2        7      138       46        5
+4       3        2        9      232      280        3
+5       3        2       10      273      312        3
+6       3        2       17      126       37        5
+7       3        4       12      423      337        0
+8       3        4       15      421      342        0
+9       4        3       11       22       56        0
+10      4        3       13       23       55        0
+2022-04-28 13:45:46,048 - get_expression_matrix - INFO - Results Matrix:
     0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
 0   0   0   0   0   0   0   0   0   1   0   0   2   0   0   2   0   0   0   0   0
 1   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0   0

@@ -13,3 +13,5 @@ numpy
 openpyxl
 PyQt5
 scanpy
+pre-commit
+pytest

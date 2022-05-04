@@ -200,11 +200,12 @@ def read_ome_metadata(filePath):
     Notes:
     A template metadata dict is available at OMETIFFReader._get_metadata_template()
     """
-    
+
     reader = OMETIFFReader(fpath=filePath)
     _, metadata, _ = reader.read()
-    
+
     return metadata
+
 
 def save_to_zarr(path, **kwargs):
     """

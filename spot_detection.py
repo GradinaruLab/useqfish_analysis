@@ -18,7 +18,7 @@ from image_manipulation import background_subtraction
 
 def spot_detection(img, thresholds, cellLabels, shape, shifts=None):
     """
-    Find spots in image and assign to given cell labels. 
+    Find spots in image and assign to given cell labels.
     """
     # set up dask for running in parallel
     daimg = [
@@ -160,11 +160,7 @@ def spot_remove_out_of_boundary(imgShape, spotCoords, radius):
         zyxCoord = coord[:-1]
         label = coord[-1]
 
-        zyxCoord = np.where(
-            zyxCoord >= 0,
-            zyxCoord,
-            np.NaN
-        )
+        zyxCoord = np.where(zyxCoord >= 0, zyxCoord, np.NaN)
         zyxCoord = np.where(
             zyxCoord < np.array([nZ, nY, nX]),
             zyxCoord,
