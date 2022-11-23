@@ -9,7 +9,7 @@
   <h1 align="center">USeqFISH Analysis</h1>
 
   <p align="center">
-    Ultrasensitive, sequential flourescence in situ hybridization (USeqFISH) is a new, highly sensitive spatial transcriptomics method for profiling endogenous and AAV genes in intact mouse and non-human primates.
+    Ultrasensitive, sequential flourescence in situ hybridization (USeqFISH) is a highly sensitive spatial transcriptomics method for profiling endogenous and virally-delivered genes in intact mouse and non-human primates.
     <br />
     <br />
     This is data analysis pipeline for images generated in USeqFISH.  
