@@ -78,13 +78,3 @@ Open ```params.py``` and set the parameters for your project.
   Once the run is finished, there will be a ```results.xlsx``` file in your image path. This contains a the expression by cell ID.
   
 <p align="right">(<a href="#top">back to top</a>)</p>
-
-
-<!-- CONTACT -->
-## Contact
-
-Min Jee Jang
-
-Project Link: [https://github.com/minjeejang/useqfish_analysis/](https://github.com/minjeejang/useqfish_analysis/)
-
-<p align="right">(<a href="#top">back to top</a>)</p>
