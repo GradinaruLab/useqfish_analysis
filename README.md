@@ -6,7 +6,7 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a> -->
 
-  <h3 align="center">USeqFISH Analysis</h3>
+  <h1 align="center">USeqFISH Analysis</h1>
 
   <p align="center">
     Ultrasensitive, sequential flourescence in situ hybridization (USeqFISH) is a new, highly sensitive spacial transcriptomics method.
